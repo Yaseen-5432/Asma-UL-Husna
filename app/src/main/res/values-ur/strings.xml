@@ -1,0 +1,63 @@
+<resources>
+    <string name="app_name">اسماء الحسنیٰ</string>
+    <string name="app_subtitle">ڈیجیٹل ایکسپلورر</string>
+    <string name="header_arabic">أَسْمَاءُ اللهِ الْحُسْنَى</string>
+    <string name="header_title">اسماء الحسنیٰ</string>
+    <string name="header_subtitle">اللہ تعالیٰ کے 99 بابرکت اور خوبصورت نام</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">ہوم</string>
+    <string name="nav_favorites">پسندیدہ</string>
+    <string name="nav_settings">ترتیبات</string>
+
+    <!-- Search -->
+    <string name="search_placeholder">نام تلاش کریں...</string>
+    <string name="search_clear">تلاش صاف کریں</string>
+    <string name="search_no_results">کوئی نام نہیں ملا</string>
+    <string name="search_no_results_desc">کسی دوسرے اردو، عربی یا انگریزی لفظ سے تلاش کرنے کی کوشش کریں</string>
+
+    <!-- Detail Screen -->
+    <string name="meaning_english_title">انگریزی معنی</string>
+    <string name="meaning_urdu_title">اردو معنی</string>
+    <string name="explanation_english_title">انگریزی تشریح</string>
+    <string name="explanation_urdu_title">تفصیلی وضاحت</string>
+    <string name="action_play_audio">تلفظ سنیں</string>
+    <string name="action_pause_audio">روکیں</string>
+    <string name="action_loading_audio">آڈیو لوڈ ہو رہی ہے…</string>
+    <string name="action_audio_unavailable">آڈیو جلد دستیاب ہوگی</string>
+    <string name="error_audio_unavailable">اس نام کی آڈیو دستیاب نہیں ہے</string>
+    <string name="error_audio_network">آڈیو نہیں چل سکی، انٹرنیٹ کنکشن چیک کریں</string>
+    <string name="action_add_favorite">پسندیدہ میں شامل کریں</string>
+    <string name="action_remove_favorite">پسندیدہ سے ہٹائیں</string>
+    <string name="action_back">پیچھے جائیں</string>
+
+    <!-- Favorites Screen -->
+    <string name="favorites_title">پسندیدہ نام</string>
+    <string name="favorites_empty_title">ابھی کوئی پسندیدہ نام نہیں ہے</string>
+    <string name="favorites_empty_desc">کسی بھی نام پر دل کے نشان کو دبا کر اسے یہاں محفوظ کریں۔</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">ترتیبات</string>
+    <string name="settings_theme_section">ظاہری شکل (تھیم)</string>
+    <string name="settings_theme_system">سسٹم ڈیفالٹ</string>
+    <string name="settings_theme_dark">ڈارک موڈ</string>
+    <string name="settings_theme_light">لائٹ موڈ</string>
+    <string name="settings_language_section">زبان</string>
+    <string name="settings_language_en">English (انگریزی)</string>
+    <string name="settings_language_ur">اردو</string>
+    <string name="settings_about_section">ایپ کے بارے میں</string>
+    <string name="settings_about_description">اسماء الحسنیٰ — ڈیجیٹل ایکسپلورر اللہ تعالیٰ کے 99 بابرکت ناموں کو سمجھنے اور یاد کرنے کے لیے بنائی گئی ایک آف لائن ایپ ہے۔</string>
+    <string name="settings_version_label">ورژن</string>
+    <string name="settings_version_value">1.0.0</string>
+
+    <!-- Full Recitation -->
+    <string name="action_play_all">تمام سنیں</string>
+    <string name="action_pause_recitation">روکیں</string>
+    <string name="action_resume_recitation">جاری رکھیں</string>
+    <string name="full_recitation_title">مکمل تلاوت</string>
+
+    <!-- Error & State -->
+    <string name="error_loading_names">ناموں کا ڈیٹا لوڈ کرنے میں مسئلہ پیش آیا۔</string>
+    <string name="action_retry">دوبارہ کوشش کریں</string>
+    <string name="loading_names">اسماء الحسنیٰ لوڈ ہو رہے ہیں…</string>
+</resources>

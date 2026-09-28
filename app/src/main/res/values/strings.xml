@@ -1,0 +1,63 @@
+<resources>
+    <string name="app_name">Asma-ul-Husna</string>
+    <string name="app_subtitle">Digital Explorer</string>
+    <string name="header_arabic">أَسْمَاءُ اللهِ الْحُسْنَى</string>
+    <string name="header_title">Asma-ul-Husna</string>
+    <string name="header_subtitle">Explore the 99 Beautiful Names of Allah</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_favorites">Favorites</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Search -->
+    <string name="search_placeholder">Search names...</string>
+    <string name="search_clear">Clear search</string>
+    <string name="search_no_results">No names found</string>
+    <string name="search_no_results_desc">Try searching with a different English, Arabic, or Urdu keyword</string>
+
+    <!-- Detail Screen -->
+    <string name="meaning_english_title">English Meaning</string>
+    <string name="meaning_urdu_title">اردو معنی</string>
+    <string name="explanation_english_title">Explanation</string>
+    <string name="explanation_urdu_title">تفصیلی وضاحت</string>
+    <string name="action_play_audio">Play Pronunciation</string>
+    <string name="action_pause_audio">Pause Pronunciation</string>
+    <string name="action_loading_audio">Loading Audio…</string>
+    <string name="action_audio_unavailable">Audio coming soon</string>
+    <string name="error_audio_unavailable">Audio unavailable for this name.</string>
+    <string name="error_audio_network">Unable to play audio. Please check internet connection.</string>
+    <string name="action_add_favorite">Add to Favorites</string>
+    <string name="action_remove_favorite">Remove from Favorites</string>
+    <string name="action_back">Navigate back</string>
+
+    <!-- Favorites Screen -->
+    <string name="favorites_title">Favorite Names</string>
+    <string name="favorites_empty_title">No favorite names yet</string>
+    <string name="favorites_empty_desc">Tap the heart icon on any name to save it here for quick access.</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_theme_section">Appearance</string>
+    <string name="settings_theme_system">System Default</string>
+    <string name="settings_theme_dark">Dark Mode</string>
+    <string name="settings_theme_light">Light Mode</string>
+    <string name="settings_language_section">Language</string>
+    <string name="settings_language_en">English</string>
+    <string name="settings_language_ur">اردو (Urdu)</string>
+    <string name="settings_about_section">About</string>
+    <string name="settings_about_description">Asma-ul-Husna — Digital Explorer is an offline Islamic application crafted with care for learning, reflecting upon, and exploring the 99 Beautiful Names of Allah.</string>
+    <string name="settings_version_label">Version</string>
+    <string name="settings_version_value">1.0.0</string>
+
+    <!-- Full Recitation -->
+    <string name="action_play_all">Play All</string>
+    <string name="action_pause_recitation">Pause</string>
+    <string name="action_resume_recitation">Resume</string>
+    <string name="full_recitation_title">Full Recitation</string>
+
+    <!-- Error & State -->
+    <string name="error_loading_names">Unable to load names dataset.</string>
+    <string name="action_retry">Retry</string>
+    <string name="loading_names">Loading 99 Names of Allah…</string>
+</resources>
