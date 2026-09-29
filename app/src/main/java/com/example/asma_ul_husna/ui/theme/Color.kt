@@ -118,3 +118,53 @@ val LightSurface = CardWhite
 val LightSurfaceVariant = CardOffWhite
 val LightBorder = GlassBorder
 val LightPrimary = PrimaryPurple
+
+// =========================================================================
+// Modern Dark Mode Palette (#0B0A1F, #12102B, #191735, #211E42, etc.)
+// =========================================================================
+val DarkMainBackground = Color(0xFF0B0A1F)
+val DarkSecondaryBackground = Color(0xFF12102B)
+val DarkCardBackground = Color(0xFF191735)
+val DarkElevatedCardBackground = Color(0xFF211E42)
+val DarkElevatedCardGradientEnd = Color(0xFF30285C)
+
+val DarkTextPrimary = Color(0xFFF8F7FF)
+val DarkTextSecondary = Color(0xFFB8B5CC)
+val DarkTextMuted = Color(0xFF85819C)
+
+val DarkPrimaryIndigo = Color(0xFF5B4BDB)
+val DarkPrimaryIndigoLight = Color(0xFF7C6CFA)
+val DarkPrimaryGold = Color(0xFFD4AF37)
+val DarkLightGold = Color(0xFFF1D477)
+
+val DarkAccentTeal = Color(0xFF35C9B5)
+val DarkAccentBlue = Color(0xFF4DA3FF)
+val DarkAccentPurple = Color(0xFF9B7CFF)
+val DarkAccentGreen = Color(0xFF55C878)
+val DarkAccentAmber = Color(0xFFF1B84B)
+val DarkAccentCoral = Color(0xFFFF6B6B)
+
+val DarkBorderSubtle = Color(0xFF302B52)
+val DarkDivider = Color(0xFF302B52)
+
+val DarkStatusSuccess = Color(0xFF55C878)
+val DarkStatusWarning = Color(0xFFF1B84B)
+val DarkStatusError = Color(0xFFFF6B6B)
+
+/**
+ * Returns a deterministic accent palette for a Name card in Dark Mode based on its ID.
+ */
+fun getDarkCardAccentTheme(nameId: Int): CardAccentTheme {
+    val darkAccents = listOf(
+        CardAccentTheme(DarkLightGold, Color(0xFF2B2418), DarkPrimaryGold.copy(alpha = 0.45f)),
+        CardAccentTheme(DarkAccentPurple, Color(0xFF261D45), DarkAccentPurple.copy(alpha = 0.35f)),
+        CardAccentTheme(DarkAccentTeal, Color(0xFF142B29), DarkAccentTeal.copy(alpha = 0.35f)),
+        CardAccentTheme(DarkAccentBlue, Color(0xFF162440), DarkAccentBlue.copy(alpha = 0.35f)),
+        CardAccentTheme(DarkAccentCoral, Color(0xFF351922), DarkAccentCoral.copy(alpha = 0.35f)),
+        CardAccentTheme(DarkAccentGreen, Color(0xFF162C1E), DarkAccentGreen.copy(alpha = 0.35f)),
+        CardAccentTheme(DarkAccentAmber, Color(0xFF2E2314), DarkAccentAmber.copy(alpha = 0.35f)),
+        CardAccentTheme(DarkPrimaryIndigoLight, Color(0xFF221C47), DarkPrimaryIndigoLight.copy(alpha = 0.35f))
+    )
+    val index = (nameId - 1).coerceAtLeast(0) % darkAccents.size
+    return darkAccents[index]
+}

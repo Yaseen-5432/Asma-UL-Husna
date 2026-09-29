@@ -48,6 +48,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -84,7 +85,7 @@ import com.example.asma_ul_husna.ui.theme.TextOnDark
 import com.example.asma_ul_husna.ui.theme.TextOnDarkSecondary
 import com.example.asma_ul_husna.ui.theme.TextPrimary
 import com.example.asma_ul_husna.ui.theme.TextSecondary
-import com.example.asma_ul_husna.ui.theme.getCardAccentTheme
+import com.example.asma_ul_husna.ui.theme.appColors
 
 @Composable
 fun NameDetailScreen(
@@ -120,6 +121,7 @@ fun NameDetailContent(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val colors = MaterialTheme.appColors
     val scrollState = rememberScrollState()
 
     val heartScale by animateFloatAsState(
@@ -139,7 +141,7 @@ fun NameDetailContent(
                         text = uiState.name?.transliteration ?: stringResource(R.string.app_name),
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.Bold,
-                            color = TextOnDark
+                            color = colors.textOnBackground
                         )
                     )
                 },
@@ -148,7 +150,7 @@ fun NameDetailContent(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.action_back),
-                            tint = BrightGold
+                            tint = colors.lightGold
                         )
                     }
                 },
@@ -160,30 +162,30 @@ fun NameDetailContent(
                                 contentDescription = stringResource(
                                     if (uiState.isFavorite) R.string.action_remove_favorite else R.string.action_add_favorite
                                 ),
-                                tint = if (uiState.isFavorite) FavoriteRed else TextOnDarkSecondary,
+                                tint = if (uiState.isFavorite) (if (colors.isDark) colors.lightGold else FavoriteRed) else colors.textOnBackgroundSecondary,
                                 modifier = Modifier.scale(heartScale)
                             )
                         }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = DeepIndigo,
-                    titleContentColor = TextOnDark
+                    containerColor = colors.mainBackground,
+                    titleContentColor = colors.textOnBackground
                 )
             )
         },
-        containerColor = DeepIndigo,
+        containerColor = colors.mainBackground,
         modifier = modifier.fillMaxSize()
     ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(DeepIndigo)
+                .background(colors.mainBackground)
         ) {
             if (uiState.isLoading) {
                 CircularProgressIndicator(
-                    color = BrightGold,
+                    color = colors.lightGold,
                     modifier = Modifier.align(Alignment.Center)
                 )
             } else if (uiState.error != null || uiState.name == null) {
@@ -194,7 +196,7 @@ fun NameDetailContent(
                 )
             } else {
                 val name = uiState.name
-                val accent = getCardAccentTheme(name.id)
+                val accent = remember(name.id, colors.isDark) { colors.cardAccent(name.id) }
 
                 Column(
                     modifier = Modifier
@@ -212,10 +214,10 @@ fun NameDetailContent(
                         OutlinedButton(
                             onClick = onPrevClick,
                             shape = RoundedCornerShape(16.dp),
-                            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.2f)),
+                            border = BorderStroke(1.dp, if (colors.isDark) colors.borderSubtle else Color.White.copy(alpha = 0.2f)),
                             colors = ButtonDefaults.outlinedButtonColors(
-                                containerColor = Color.White.copy(alpha = 0.08f),
-                                contentColor = BrightGold
+                                containerColor = if (colors.isDark) colors.cardBackground else Color.White.copy(alpha = 0.08f),
+                                contentColor = colors.lightGold
                             ),
                             contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp)
                         ) {
@@ -234,14 +236,14 @@ fun NameDetailContent(
                         // Number Badge Pill
                         Surface(
                             shape = RoundedCornerShape(16.dp),
-                            color = PrimaryPurple.copy(alpha = 0.35f),
-                            border = BorderStroke(1.dp, BrightGold.copy(alpha = 0.4f))
+                            color = if (colors.isDark) colors.elevatedCardBackground else colors.primaryIndigo.copy(alpha = 0.35f),
+                            border = BorderStroke(1.dp, colors.primaryGold.copy(alpha = 0.4f))
                         ) {
                             Text(
                                 text = "${name.id} / 99",
                                 style = MaterialTheme.typography.labelLarge.copy(
                                     fontWeight = FontWeight.Bold,
-                                    color = BrightGold
+                                    color = colors.lightGold
                                 ),
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                             )
@@ -250,10 +252,10 @@ fun NameDetailContent(
                         OutlinedButton(
                             onClick = onNextClick,
                             shape = RoundedCornerShape(16.dp),
-                            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.2f)),
+                            border = BorderStroke(1.dp, if (colors.isDark) colors.borderSubtle else Color.White.copy(alpha = 0.2f)),
                             colors = ButtonDefaults.outlinedButtonColors(
-                                containerColor = Color.White.copy(alpha = 0.08f),
-                                contentColor = BrightGold
+                                containerColor = if (colors.isDark) colors.cardBackground else Color.White.copy(alpha = 0.08f),
+                                contentColor = colors.lightGold
                             ),
                             contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp)
                         ) {
@@ -273,40 +275,62 @@ fun NameDetailContent(
                     Spacer(modifier = Modifier.height(18.dp))
 
                     // 1. Hero Presentation Card (Large Arabic Calligraphy + Transliteration + Audio Player)
+                    val heroBorderBrush = if (colors.isDark) {
+                        Brush.linearGradient(
+                            colors = listOf(
+                                colors.primaryIndigo.copy(alpha = 0.5f),
+                                colors.primaryGold.copy(alpha = 0.35f),
+                                Color.Transparent
+                            )
+                        )
+                    } else {
+                        Brush.linearGradient(
+                            colors = listOf(
+                                PrimaryPurpleLight.copy(alpha = 0.6f),
+                                IslamicGold.copy(alpha = 0.35f),
+                                Color.Transparent
+                            )
+                        )
+                    }
+
+                    val heroBackgroundBrush = if (colors.isDark) {
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                colors.elevatedCardBackground,
+                                colors.elevatedCardGradientEnd,
+                                colors.cardBackground
+                            )
+                        )
+                    } else {
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                PrimaryPurple,
+                                PrimaryPurple.copy(alpha = 0.85f),
+                                DeepIndigoDark
+                            )
+                        )
+                    }
+
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
                             .shadow(
                                 elevation = 12.dp,
                                 shape = RoundedCornerShape(26.dp),
-                                ambientColor = PrimaryPurple.copy(alpha = 0.4f),
+                                ambientColor = if (colors.isDark) colors.primaryIndigo.copy(alpha = 0.2f) else PrimaryPurple.copy(alpha = 0.4f),
                                 spotColor = Color(0x66000000)
                             ),
                         shape = RoundedCornerShape(26.dp),
                         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                         border = BorderStroke(
                             width = 1.dp,
-                            brush = Brush.linearGradient(
-                                colors = listOf(
-                                    PrimaryPurpleLight.copy(alpha = 0.6f),
-                                    IslamicGold.copy(alpha = 0.35f),
-                                    Color.Transparent
-                                )
-                            )
+                            brush = heroBorderBrush
                         )
                     ) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(
-                                    Brush.verticalGradient(
-                                        colors = listOf(
-                                            PrimaryPurple,
-                                            PrimaryPurple.copy(alpha = 0.85f),
-                                            DeepIndigoDark
-                                        )
-                                    )
-                                )
+                                .background(heroBackgroundBrush)
                                 .padding(24.dp)
                         ) {
                             Column(
@@ -321,7 +345,7 @@ fun NameDetailContent(
                                             fontFamily = ArabicFontFamily,
                                             fontSize = 42.sp,
                                             fontWeight = FontWeight.Bold,
-                                            color = BrightGold,
+                                            color = colors.lightGold,
                                             textAlign = TextAlign.Center,
                                             textDirection = TextDirection.Rtl,
                                             lineHeight = 56.sp
@@ -338,7 +362,7 @@ fun NameDetailContent(
                                     style = MaterialTheme.typography.headlineMedium.copy(
                                         fontFamily = EnglishFontFamily,
                                         fontWeight = FontWeight.Bold,
-                                        color = TextOnDark,
+                                        color = colors.textOnBackground,
                                         textAlign = TextAlign.Center
                                     )
                                 )
@@ -350,7 +374,7 @@ fun NameDetailContent(
                                     text = name.englishMeaning,
                                     style = MaterialTheme.typography.titleMedium.copy(
                                         fontFamily = EnglishFontFamily,
-                                        color = TextOnDarkSecondary,
+                                        color = colors.textOnBackgroundSecondary,
                                         textAlign = TextAlign.Center
                                     )
                                 )
@@ -377,7 +401,7 @@ fun NameDetailContent(
                                         enabled = !isCurrentAudioLoading,
                                         shape = RoundedCornerShape(16.dp),
                                         colors = ButtonDefaults.buttonColors(
-                                            containerColor = IslamicGold,
+                                            containerColor = colors.primaryGold,
                                             contentColor = DeepIndigoDark
                                         ),
                                         modifier = Modifier.weight(1f)
@@ -424,7 +448,7 @@ fun NameDetailContent(
                                         Text(
                                             text = audioErrorMessage,
                                             style = MaterialTheme.typography.bodySmall.copy(
-                                                color = TextOnDark,
+                                                color = colors.textOnBackground,
                                                 textAlign = TextAlign.Center
                                             ),
                                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
@@ -437,18 +461,19 @@ fun NameDetailContent(
 
                     Spacer(modifier = Modifier.height(18.dp))
 
-                    // 2. English Meaning & Explanation Card (Modern White Card)
+                    // 2. English Meaning & Explanation Card
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
                             .shadow(
                                 elevation = 6.dp,
                                 shape = RoundedCornerShape(22.dp),
-                                ambientColor = Color(0x14000000),
-                                spotColor = Color(0x1F000000)
+                                ambientColor = if (colors.isDark) Color(0x22000000) else Color(0x14000000),
+                                spotColor = if (colors.isDark) Color(0x33000000) else Color(0x1F000000)
                             ),
                         shape = RoundedCornerShape(22.dp),
-                        colors = CardDefaults.cardColors(containerColor = CardWhite),
+                        colors = CardDefaults.cardColors(containerColor = colors.cardBackground),
+                        border = if (colors.isDark) BorderStroke(1.dp, colors.borderSubtle) else null,
                         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                     ) {
                         Column(
@@ -477,7 +502,7 @@ fun NameDetailContent(
                                 text = name.englishMeaning,
                                 style = MaterialTheme.typography.titleLarge.copy(
                                     fontWeight = FontWeight.Bold,
-                                    color = TextPrimary
+                                    color = colors.textPrimary
                                 )
                             )
 
@@ -503,7 +528,7 @@ fun NameDetailContent(
                             Text(
                                 text = name.explanation,
                                 style = MaterialTheme.typography.bodyLarge.copy(
-                                    color = TextSecondary,
+                                    color = colors.textSecondary,
                                     lineHeight = 24.sp
                                 )
                             )
@@ -512,18 +537,19 @@ fun NameDetailContent(
 
                     Spacer(modifier = Modifier.height(18.dp))
 
-                    // 3. Urdu Meaning & Explanation Card (Modern White Card, RTL)
+                    // 3. Urdu Meaning & Explanation Card (RTL)
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
                             .shadow(
                                 elevation = 6.dp,
                                 shape = RoundedCornerShape(22.dp),
-                                ambientColor = Color(0x14000000),
-                                spotColor = Color(0x1F000000)
+                                ambientColor = if (colors.isDark) Color(0x22000000) else Color(0x14000000),
+                                spotColor = if (colors.isDark) Color(0x33000000) else Color(0x1F000000)
                             ),
                         shape = RoundedCornerShape(22.dp),
-                        colors = CardDefaults.cardColors(containerColor = CardWhite),
+                        colors = CardDefaults.cardColors(containerColor = colors.cardBackground),
+                        border = if (colors.isDark) BorderStroke(1.dp, colors.borderSubtle) else null,
                         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                     ) {
                         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
@@ -553,7 +579,7 @@ fun NameDetailContent(
                                     text = name.nameUrdu,
                                     style = MaterialTheme.typography.headlineSmall.copy(
                                         fontWeight = FontWeight.Bold,
-                                        color = TextPrimary,
+                                        color = colors.textPrimary,
                                         textDirection = TextDirection.Rtl,
                                         fontSize = 22.sp
                                     ),
@@ -582,7 +608,7 @@ fun NameDetailContent(
                                 Text(
                                     text = name.meaningUrdu,
                                     style = MaterialTheme.typography.bodyLarge.copy(
-                                        color = TextSecondary,
+                                        color = colors.textSecondary,
                                         lineHeight = 28.sp,
                                         fontSize = 17.sp,
                                         textDirection = TextDirection.Rtl

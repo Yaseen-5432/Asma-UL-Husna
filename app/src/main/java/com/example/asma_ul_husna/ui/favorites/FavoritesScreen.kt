@@ -1,5 +1,6 @@
 package com.example.asma_ul_husna.ui.favorites
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -34,12 +35,7 @@ import com.example.asma_ul_husna.R
 import com.example.asma_ul_husna.ui.components.EmptyStateView
 import com.example.asma_ul_husna.ui.components.ErrorStateView
 import com.example.asma_ul_husna.ui.components.NameCard
-import com.example.asma_ul_husna.ui.theme.BrightGold
-import com.example.asma_ul_husna.ui.theme.DeepIndigo
-import com.example.asma_ul_husna.ui.theme.IslamicGold
-import com.example.asma_ul_husna.ui.theme.PrimaryPurple
-import com.example.asma_ul_husna.ui.theme.TextOnDark
-import com.example.asma_ul_husna.ui.theme.TextOnDarkSecondary
+import com.example.asma_ul_husna.ui.theme.appColors
 
 @Composable
 fun FavoritesScreen(
@@ -66,14 +62,16 @@ fun FavoritesContent(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val colors = MaterialTheme.appColors
+
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(DeepIndigo)
+            .background(colors.mainBackground)
     ) {
         if (uiState.isLoading) {
             CircularProgressIndicator(
-                color = BrightGold,
+                color = colors.lightGold,
                 modifier = Modifier.align(Alignment.Center)
             )
         } else if (uiState.error != null) {
@@ -115,27 +113,28 @@ fun FavoritesContent(
                                 text = stringResource(R.string.favorites_title),
                                 style = MaterialTheme.typography.headlineMedium.copy(
                                     fontWeight = FontWeight.ExtraBold,
-                                    color = TextOnDark
+                                    color = colors.textOnBackground
                                 )
                             )
                             Spacer(modifier = Modifier.height(2.dp))
                             Text(
                                 text = "${uiState.favoriteNames.size} saved",
                                 style = MaterialTheme.typography.bodyMedium.copy(
-                                    color = TextOnDarkSecondary
+                                    color = colors.textOnBackgroundSecondary
                                 )
                             )
                         }
 
                         Surface(
                             shape = RoundedCornerShape(12.dp),
-                            color = PrimaryPurple.copy(alpha = 0.35f)
+                            color = if (colors.isDark) colors.elevatedCardBackground else colors.primaryIndigo.copy(alpha = 0.35f),
+                            border = if (colors.isDark) BorderStroke(1.dp, colors.borderSubtle) else null
                         ) {
                             Text(
                                 text = "${uiState.favoriteNames.size} / 99",
                                 style = MaterialTheme.typography.labelLarge.copy(
                                     fontWeight = FontWeight.Bold,
-                                    color = BrightGold
+                                    color = colors.lightGold
                                 ),
                                 modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
                             )

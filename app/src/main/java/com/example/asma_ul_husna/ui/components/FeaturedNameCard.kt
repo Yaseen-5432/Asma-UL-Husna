@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -50,10 +49,10 @@ import com.example.asma_ul_husna.ui.theme.ArabicFontFamily
 import com.example.asma_ul_husna.ui.theme.CardWhite
 import com.example.asma_ul_husna.ui.theme.FavoriteRed
 import com.example.asma_ul_husna.ui.theme.IslamicGold
-import com.example.asma_ul_husna.ui.theme.PaleGold
 import com.example.asma_ul_husna.ui.theme.PrimaryPurple
 import com.example.asma_ul_husna.ui.theme.TextPrimary
 import com.example.asma_ul_husna.ui.theme.TextSecondary
+import com.example.asma_ul_husna.ui.theme.appColors
 
 /**
  * Modern Featured "Name of the Day" presentation card.
@@ -67,32 +66,44 @@ fun FeaturedNameCard(
     onFavoriteToggle: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val colors = MaterialTheme.appColors
+
+    val cardGradient = if (colors.isDark) {
+        Brush.verticalGradient(
+            colors = listOf(
+                Color(0xFF2E2718),
+                colors.elevatedCardBackground
+            )
+        )
+    } else {
+        Brush.verticalGradient(
+            colors = listOf(
+                AccentGoldBg.copy(alpha = 0.6f),
+                CardWhite
+            )
+        )
+    }
+
     Card(
         modifier = modifier
             .fillMaxWidth()
             .shadow(
                 elevation = 8.dp,
                 shape = RoundedCornerShape(24.dp),
-                ambientColor = Color(0x18000000),
-                spotColor = Color(0x22000000)
+                ambientColor = if (colors.isDark) colors.primaryIndigo.copy(alpha = 0.15f) else Color(0x18000000),
+                spotColor = if (colors.isDark) colors.primaryGold.copy(alpha = 0.25f) else Color(0x22000000)
             )
             .clip(RoundedCornerShape(24.dp))
             .clickable { onNameClick(name.id) },
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        colors = CardDefaults.cardColors(containerColor = colors.elevatedCardBackground),
+        border = if (colors.isDark) BorderStroke(1.dp, colors.borderSubtle) else null,
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            AccentGoldBg.copy(alpha = 0.6f),
-                            CardWhite
-                        )
-                    )
-                )
+                .background(cardGradient)
                 .padding(20.dp)
         ) {
             Column(
@@ -107,14 +118,14 @@ fun FeaturedNameCard(
                 ) {
                     Surface(
                         shape = RoundedCornerShape(12.dp),
-                        color = AccentGoldBg,
-                        border = BorderStroke(0.8.dp, AccentGold.copy(alpha = 0.45f))
+                        color = if (colors.isDark) Color(0xFF2E2718) else AccentGoldBg,
+                        border = BorderStroke(0.8.dp, colors.primaryGold.copy(alpha = 0.45f))
                     ) {
                         Text(
                             text = stringResource(R.string.featured_name_badge),
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = AccentGold,
+                                color = if (colors.isDark) colors.lightGold else AccentGold,
                                 letterSpacing = 1.sp
                             ),
                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
@@ -125,13 +136,13 @@ fun FeaturedNameCard(
                         // Number Pill
                         Surface(
                             shape = RoundedCornerShape(8.dp),
-                            color = PrimaryPurple.copy(alpha = 0.08f)
+                            color = if (colors.isDark) colors.primaryIndigo.copy(alpha = 0.2f) else PrimaryPurple.copy(alpha = 0.08f)
                         ) {
                             Text(
                                 text = "#${name.id}",
                                 style = MaterialTheme.typography.labelSmall.copy(
                                     fontWeight = FontWeight.Bold,
-                                    color = PrimaryPurple
+                                    color = if (colors.isDark) Color(0xFF9B7CFF) else PrimaryPurple
                                 ),
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
                             )
@@ -146,7 +157,7 @@ fun FeaturedNameCard(
                             Icon(
                                 imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                                 contentDescription = null,
-                                tint = if (isFavorite) FavoriteRed else TextSecondary.copy(alpha = 0.6f),
+                                tint = if (isFavorite) (if (colors.isDark) colors.lightGold else FavoriteRed) else (if (colors.isDark) colors.textMuted else TextSecondary.copy(alpha = 0.6f)),
                                 modifier = Modifier.size(20.dp)
                             )
                         }
@@ -163,7 +174,7 @@ fun FeaturedNameCard(
                             fontFamily = ArabicFontFamily,
                             fontSize = 34.sp,
                             fontWeight = FontWeight.Bold,
-                            color = IslamicGold,
+                            color = if (colors.isDark) colors.lightGold else IslamicGold,
                             textAlign = TextAlign.Center,
                             textDirection = TextDirection.Rtl,
                             lineHeight = 44.sp
@@ -179,7 +190,7 @@ fun FeaturedNameCard(
                     text = name.transliteration,
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.Bold,
-                        color = TextPrimary,
+                        color = colors.textPrimary,
                         letterSpacing = 0.3.sp
                     ),
                     textAlign = TextAlign.Center
@@ -191,7 +202,7 @@ fun FeaturedNameCard(
                 Text(
                     text = name.englishMeaning,
                     style = MaterialTheme.typography.bodyMedium.copy(
-                        color = TextSecondary,
+                        color = colors.textSecondary,
                         fontWeight = FontWeight.Normal
                     ),
                     textAlign = TextAlign.Center
@@ -203,7 +214,7 @@ fun FeaturedNameCard(
                 Surface(
                     onClick = { onNameClick(name.id) },
                     shape = RoundedCornerShape(16.dp),
-                    color = PrimaryPurple,
+                    color = colors.primaryIndigo,
                     contentColor = Color.White
                 ) {
                     Row(

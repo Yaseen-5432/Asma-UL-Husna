@@ -20,10 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.asma_ul_husna.R
-import com.example.asma_ul_husna.ui.theme.CardWhite
-import com.example.asma_ul_husna.ui.theme.PrimaryPurple
-import com.example.asma_ul_husna.ui.theme.TextOnDark
-import com.example.asma_ul_husna.ui.theme.TextOnDarkSecondary
+import com.example.asma_ul_husna.ui.theme.appColors
 
 enum class NameFilterType(val titleRes: Int) {
     ALL(R.string.filter_all),
@@ -42,6 +39,7 @@ fun CategoryChipsRow(
     onFilterSelected: (NameFilterType) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val colors = MaterialTheme.appColors
     val scrollState = rememberScrollState()
 
     Row(
@@ -54,12 +52,12 @@ fun CategoryChipsRow(
             val isSelected = filter == selectedFilter
 
             val chipBgColor by animateColorAsState(
-                targetValue = if (isSelected) PrimaryPurple else Color.White.copy(alpha = 0.12f),
+                targetValue = if (isSelected) colors.chipActiveBg else colors.chipInactiveBg,
                 label = "chipBgColor"
             )
 
             val chipTextColor by animateColorAsState(
-                targetValue = if (isSelected) TextOnDark else TextOnDarkSecondary,
+                targetValue = if (isSelected) colors.chipActiveText else colors.chipInactiveText,
                 label = "chipTextColor"
             )
 
@@ -68,9 +66,9 @@ fun CategoryChipsRow(
                 shape = RoundedCornerShape(20.dp),
                 color = chipBgColor,
                 border = if (isSelected) {
-                    BorderStroke(1.dp, PrimaryPurple)
+                    BorderStroke(1.dp, colors.chipActiveBg)
                 } else {
-                    BorderStroke(0.5.dp, Color.White.copy(alpha = 0.2f))
+                    BorderStroke(0.5.dp, colors.chipInactiveBorder)
                 }
             ) {
                 Text(

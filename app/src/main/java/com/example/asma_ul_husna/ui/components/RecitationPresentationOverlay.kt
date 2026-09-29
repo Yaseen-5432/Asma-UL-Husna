@@ -72,8 +72,7 @@ import com.example.asma_ul_husna.ui.theme.IslamicGold
 import com.example.asma_ul_husna.ui.theme.PaleGold
 import com.example.asma_ul_husna.ui.theme.PrimaryPurple
 import com.example.asma_ul_husna.ui.theme.PrimaryPurpleLight
-import com.example.asma_ul_husna.ui.theme.TextOnDark
-import com.example.asma_ul_husna.ui.theme.TextOnDarkSecondary
+import com.example.asma_ul_husna.ui.theme.appColors
 
 /**
  * Dedicated Floating 3D Centerpiece Presentation Layer for Full Recitation.
@@ -92,6 +91,7 @@ fun RecitationPresentationOverlay(
     onNameClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val colors = MaterialTheme.appColors
     val isVisible = activeName != null
 
     AnimatedVisibility(
@@ -217,7 +217,7 @@ fun RecitationPresentationOverlay(
                     .clip(RoundedCornerShape(28.dp))
                     .clickable { onNameClick(activeName.id) },
                 shape = RoundedCornerShape(28.dp),
-                colors = CardDefaults.cardColors(containerColor = DeepIndigoDark),
+                colors = CardDefaults.cardColors(containerColor = if (colors.isDark) colors.elevatedCardBackground else DeepIndigoDark),
                 border = BorderStroke(
                     width = 2.dp,
                     brush = createShimmerGoldBorder(shimmerOffset)
@@ -229,11 +229,19 @@ fun RecitationPresentationOverlay(
                         .fillMaxWidth()
                         .background(
                             Brush.verticalGradient(
-                                colors = listOf(
-                                    PrimaryPurple.copy(alpha = 0.9f),
-                                    DeepIndigoDark,
-                                    DeepIndigoDark
-                                )
+                                colors = if (colors.isDark) {
+                                    listOf(
+                                        colors.elevatedCardGradientEnd,
+                                        colors.elevatedCardBackground,
+                                        colors.elevatedCardBackground
+                                    )
+                                } else {
+                                    listOf(
+                                        PrimaryPurple.copy(alpha = 0.9f),
+                                        DeepIndigoDark,
+                                        DeepIndigoDark
+                                    )
+                                }
                             )
                         )
                         .padding(24.dp)
@@ -250,8 +258,8 @@ fun RecitationPresentationOverlay(
                         ) {
                             Surface(
                                 shape = RoundedCornerShape(10.dp),
-                                color = IslamicGold.copy(alpha = 0.25f),
-                                border = BorderStroke(1.dp, BrightGold.copy(alpha = 0.6f))
+                                color = colors.primaryGold.copy(alpha = 0.25f),
+                                border = BorderStroke(1.dp, colors.lightGold.copy(alpha = 0.6f))
                             ) {
                                 Row(
                                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
@@ -261,7 +269,7 @@ fun RecitationPresentationOverlay(
                                         text = "#${activeName.id} / 99",
                                         style = MaterialTheme.typography.labelMedium.copy(
                                             fontWeight = FontWeight.Bold,
-                                            color = BrightGold
+                                            color = colors.lightGold
                                         )
                                     )
                                 }
@@ -272,7 +280,7 @@ fun RecitationPresentationOverlay(
                                     Icon(
                                         imageVector = Icons.Filled.GraphicEq,
                                         contentDescription = null,
-                                        tint = BrightGold,
+                                        tint = colors.lightGold,
                                         modifier = Modifier.size(20.dp)
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
@@ -285,7 +293,7 @@ fun RecitationPresentationOverlay(
                                     Icon(
                                         imageVector = Icons.Default.Close,
                                         contentDescription = "Dismiss overlay",
-                                        tint = TextOnDarkSecondary,
+                                        tint = colors.textSecondary,
                                         modifier = Modifier.size(20.dp)
                                     )
                                 }
@@ -302,7 +310,7 @@ fun RecitationPresentationOverlay(
                                     fontFamily = ArabicFontFamily,
                                     fontSize = 46.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = BrightGold,
+                                    color = if (colors.isDark) colors.textPrimary else BrightGold,
                                     textAlign = TextAlign.Center,
                                     textDirection = TextDirection.Rtl,
                                     lineHeight = 60.sp
@@ -319,7 +327,7 @@ fun RecitationPresentationOverlay(
                             style = MaterialTheme.typography.headlineMedium.copy(
                                 fontFamily = EnglishFontFamily,
                                 fontWeight = FontWeight.Bold,
-                                color = TextOnDark,
+                                color = colors.textOnBackground,
                                 textAlign = TextAlign.Center,
                                 letterSpacing = 0.4.sp
                             )
@@ -332,7 +340,7 @@ fun RecitationPresentationOverlay(
                             Text(
                                 text = activeName.nameUrdu,
                                 style = MaterialTheme.typography.titleMedium.copy(
-                                    color = PaleGold,
+                                    color = colors.lightGold,
                                     fontWeight = FontWeight.SemiBold,
                                     textAlign = TextAlign.Center,
                                     textDirection = TextDirection.Rtl,
@@ -349,7 +357,7 @@ fun RecitationPresentationOverlay(
                             text = activeName.englishMeaning,
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 fontFamily = EnglishFontFamily,
-                                color = TextOnDarkSecondary,
+                                color = colors.textSecondary,
                                 textAlign = TextAlign.Center,
                                 lineHeight = 20.sp
                             ),

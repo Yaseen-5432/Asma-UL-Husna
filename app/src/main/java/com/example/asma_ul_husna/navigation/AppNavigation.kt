@@ -57,6 +57,7 @@ import com.example.asma_ul_husna.ui.theme.DeepIndigoDark
 import com.example.asma_ul_husna.ui.theme.PrimaryPurple
 import com.example.asma_ul_husna.ui.theme.TextOnDark
 import com.example.asma_ul_husna.ui.theme.TextOnDarkSecondary
+import com.example.asma_ul_husna.ui.theme.appColors
 
 sealed class Screen(
     val route: String,
@@ -119,13 +120,14 @@ fun AppNavigation(
     val currentRoute = navBackStackEntry?.destination?.route
 
     val shouldShowBottomBar = bottomNavScreens.any { it.route == currentRoute }
+    val colors = MaterialTheme.appColors
 
     Scaffold(
-        containerColor = DeepIndigo,
+        containerColor = colors.mainBackground,
         bottomBar = {
             if (shouldShowBottomBar) {
                 NavigationBar(
-                    containerColor = DeepIndigoDark,
+                    containerColor = colors.bottomNavBg,
                     tonalElevation = 0.dp
                 ) {
                     bottomNavScreens.forEach { screen ->
@@ -157,11 +159,11 @@ fun AppNavigation(
                                 )
                             },
                             colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = BrightGold,
-                                selectedTextColor = BrightGold,
-                                indicatorColor = PrimaryPurple,
-                                unselectedIconColor = TextOnDarkSecondary.copy(alpha = 0.7f),
-                                unselectedTextColor = TextOnDarkSecondary.copy(alpha = 0.7f)
+                                selectedIconColor = colors.bottomNavSelected,
+                                selectedTextColor = colors.bottomNavSelected,
+                                indicatorColor = colors.bottomNavIndicator,
+                                unselectedIconColor = colors.bottomNavUnselected,
+                                unselectedTextColor = colors.bottomNavUnselected
                             )
                         )
                     }

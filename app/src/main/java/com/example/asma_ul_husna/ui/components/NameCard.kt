@@ -69,7 +69,7 @@ import com.example.asma_ul_husna.ui.theme.FavoriteRed
 import com.example.asma_ul_husna.ui.theme.IslamicGold
 import com.example.asma_ul_husna.ui.theme.TextPrimary
 import com.example.asma_ul_husna.ui.theme.TextSecondary
-import com.example.asma_ul_husna.ui.theme.getCardAccentTheme
+import com.example.asma_ul_husna.ui.theme.appColors
 import kotlin.math.abs
 
 /**
@@ -94,7 +94,8 @@ fun NameCard(
     isPaused: Boolean = false,
     relativePosition: Int = 0
 ) {
-    val accent = remember(name.id) { getCardAccentTheme(name.id) }
+    val colors = MaterialTheme.appColors
+    val accent = remember(name.id, colors.isDark) { colors.cardAccent(name.id) }
 
     // -----------------------------------------------------------------------------------------
     // 1. Favorite Heart Animation (Modern quick scale bounce)
@@ -109,7 +110,7 @@ fun NameCard(
     )
 
     val heartColor by animateColorAsState(
-        targetValue = if (isFavorite) FavoriteRed else TextSecondary.copy(alpha = 0.45f),
+        targetValue = if (isFavorite) (if (colors.isDark) colors.lightGold else FavoriteRed) else (if (colors.isDark) colors.textMuted else TextSecondary.copy(alpha = 0.45f)),
         label = "heartColor"
     )
 
@@ -266,14 +267,21 @@ fun NameCard(
             brush = createShimmerGoldBorder(shimmerOffset)
         )
     } else {
-        BorderStroke(
-            width = 0.5.dp,
-            color = accent.border.copy(alpha = 0.35f)
-        )
+        if (colors.isDark) {
+            BorderStroke(
+                width = 1.dp,
+                color = colors.borderSubtle
+            )
+        } else {
+            BorderStroke(
+                width = 0.5.dp,
+                color = accent.border.copy(alpha = 0.35f)
+            )
+        }
     }
 
     // -----------------------------------------------------------------------------------------
-    // 5. Composition Structure: Ambient Glow Backdrop + Modern White Card
+    // 5. Composition Structure: Ambient Glow Backdrop + Modern Card
     // -----------------------------------------------------------------------------------------
     Box(
         modifier = modifier.fillMaxWidth(),
@@ -299,15 +307,15 @@ fun NameCard(
             )
         }
 
-        // Modern White Rounded Card
+        // Modern Rounded Card
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .shadow(
                     elevation = renderElevation,
                     shape = RoundedCornerShape(22.dp),
-                    ambientColor = if (isHighlighted) BrightGold.copy(alpha = 0.5f) else Color(0x14000000),
-                    spotColor = if (isHighlighted) IslamicGold else Color(0x1F000000)
+                    ambientColor = if (isHighlighted) colors.lightGold.copy(alpha = 0.5f) else (if (colors.isDark) Color(0x22000000) else Color(0x14000000)),
+                    spotColor = if (isHighlighted) colors.primaryGold else (if (colors.isDark) Color(0x33000000) else Color(0x1F000000))
                 )
                 .graphicsLayer {
                     scaleX = renderScale
@@ -324,7 +332,7 @@ fun NameCard(
                 .clickable(onClick = onCardClick),
             shape = RoundedCornerShape(22.dp),
             colors = CardDefaults.cardColors(
-                containerColor = CardWhite
+                containerColor = colors.cardBackground
             ),
             border = borderStroke,
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
@@ -337,14 +345,14 @@ fun NameCard(
                             Brush.verticalGradient(
                                 colors = listOf(
                                     accent.background.copy(alpha = 0.8f),
-                                    CardWhite
+                                    if (colors.isDark) colors.elevatedCardBackground else CardWhite
                                 )
                             )
                         } else {
                             Brush.verticalGradient(
                                 colors = listOf(
                                     accent.background.copy(alpha = 0.35f),
-                                    CardWhite
+                                    colors.cardBackground
                                 )
                             )
                         }
@@ -406,7 +414,7 @@ fun NameCard(
                                 fontFamily = ArabicFontFamily,
                                 fontSize = 26.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = IslamicGold,
+                                color = if (colors.isDark) colors.textPrimary else IslamicGold,
                                 textAlign = TextAlign.Center,
                                 textDirection = TextDirection.Rtl,
                                 lineHeight = 34.sp
@@ -425,7 +433,7 @@ fun NameCard(
                         style = MaterialTheme.typography.titleSmall.copy(
                             fontFamily = EnglishFontFamily,
                             fontWeight = FontWeight.Bold,
-                            color = TextPrimary,
+                            color = colors.textPrimary,
                             textAlign = TextAlign.Center
                         ),
                         maxLines = 1,
@@ -440,7 +448,7 @@ fun NameCard(
                         style = MaterialTheme.typography.bodySmall.copy(
                             fontFamily = EnglishFontFamily,
                             fontSize = 11.5.sp,
-                            color = TextSecondary,
+                            color = colors.textSecondary,
                             textAlign = TextAlign.Center,
                             lineHeight = 15.sp
                         ),

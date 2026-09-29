@@ -14,8 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.asma_ul_husna.R
-import com.example.asma_ul_husna.ui.theme.TextOnDark
-import com.example.asma_ul_husna.ui.theme.TextOnDarkSecondary
+import com.example.asma_ul_husna.ui.theme.appColors
 
 /**
  * Modern header section for the Home screen.
@@ -25,6 +24,8 @@ import com.example.asma_ul_husna.ui.theme.TextOnDarkSecondary
 fun HeaderSection(
     modifier: Modifier = Modifier
 ) {
+    val colors = MaterialTheme.appColors
+
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.Start
@@ -33,7 +34,7 @@ fun HeaderSection(
             text = stringResource(R.string.header_title),
             style = MaterialTheme.typography.displayMedium.copy(
                 fontWeight = FontWeight.ExtraBold,
-                color = TextOnDark,
+                color = colors.textOnBackground,
                 letterSpacing = 0.sp
             )
         )
@@ -43,7 +44,7 @@ fun HeaderSection(
         Text(
             text = stringResource(R.string.header_subtitle),
             style = MaterialTheme.typography.bodyMedium.copy(
-                color = TextOnDarkSecondary,
+                color = colors.textOnBackgroundSecondary,
                 fontWeight = FontWeight.Medium
             )
         )

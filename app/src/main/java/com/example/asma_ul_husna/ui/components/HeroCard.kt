@@ -45,8 +45,7 @@ import com.example.asma_ul_husna.ui.theme.IslamicGold
 import com.example.asma_ul_husna.ui.theme.PaleGold
 import com.example.asma_ul_husna.ui.theme.PrimaryPurple
 import com.example.asma_ul_husna.ui.theme.PrimaryPurpleLight
-import com.example.asma_ul_husna.ui.theme.TextOnDark
-import com.example.asma_ul_husna.ui.theme.TextOnDarkSecondary
+import com.example.asma_ul_husna.ui.theme.appColors
 
 /**
  * Modern Hero Card for the Asma-ul-Husna home screen.
@@ -56,40 +55,61 @@ import com.example.asma_ul_husna.ui.theme.TextOnDarkSecondary
 fun HeroCard(
     modifier: Modifier = Modifier
 ) {
+    val colors = MaterialTheme.appColors
+
+    val borderBrush = if (colors.isDark) {
+        Brush.linearGradient(
+            colors = listOf(
+                colors.primaryIndigo.copy(alpha = 0.5f),
+                colors.primaryGold.copy(alpha = 0.35f),
+                Color.Transparent
+            )
+        )
+    } else {
+        Brush.linearGradient(
+            colors = listOf(
+                PrimaryPurpleLight.copy(alpha = 0.6f),
+                IslamicGold.copy(alpha = 0.35f),
+                Color.Transparent
+            )
+        )
+    }
+
+    val cardGradient = if (colors.isDark) {
+        Brush.verticalGradient(
+            colors = listOf(
+                colors.elevatedCardBackground,
+                colors.elevatedCardGradientEnd,
+                colors.cardBackground
+            )
+        )
+    } else {
+        Brush.verticalGradient(
+            colors = listOf(
+                PrimaryPurple,
+                PrimaryPurple.copy(alpha = 0.85f),
+                DeepIndigoDark
+            )
+        )
+    }
+
     Card(
         modifier = modifier
             .fillMaxWidth()
             .shadow(
                 elevation = 12.dp,
                 shape = RoundedCornerShape(26.dp),
-                ambientColor = PrimaryPurple.copy(alpha = 0.4f),
+                ambientColor = if (colors.isDark) colors.primaryIndigo.copy(alpha = 0.2f) else PrimaryPurple.copy(alpha = 0.4f),
                 spotColor = Color(0x66000000)
             ),
         shape = RoundedCornerShape(26.dp),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-        border = BorderStroke(
-            width = 1.dp,
-            brush = Brush.linearGradient(
-                colors = listOf(
-                    PrimaryPurpleLight.copy(alpha = 0.6f),
-                    IslamicGold.copy(alpha = 0.35f),
-                    Color.Transparent
-                )
-            )
-        )
+        border = BorderStroke(width = 1.dp, brush = borderBrush)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            PrimaryPurple,
-                            PrimaryPurple.copy(alpha = 0.85f),
-                            DeepIndigoDark
-                        )
-                    )
-                )
+                .background(cardGradient)
                 .padding(22.dp)
         ) {
             // Decorative background radial circles
@@ -100,7 +120,7 @@ fun HeroCard(
                     .background(
                         Brush.radialGradient(
                             colors = listOf(
-                                BrightGold.copy(alpha = 0.15f),
+                                colors.lightGold.copy(alpha = 0.15f),
                                 Color.Transparent
                             )
                         ),
@@ -116,7 +136,7 @@ fun HeroCard(
                 Surface(
                     shape = RoundedCornerShape(12.dp),
                     color = Color.White.copy(alpha = 0.12f),
-                    border = BorderStroke(0.5.dp, BrightGold.copy(alpha = 0.4f))
+                    border = BorderStroke(0.5.dp, colors.lightGold.copy(alpha = 0.4f))
                 ) {
                     Row(
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp),
@@ -126,7 +146,7 @@ fun HeroCard(
                         Icon(
                             imageVector = Icons.Default.AutoAwesome,
                             contentDescription = null,
-                            tint = BrightGold,
+                            tint = colors.lightGold,
                             modifier = Modifier.size(13.dp)
                         )
                         Spacer(modifier = Modifier.size(6.dp))
@@ -134,7 +154,7 @@ fun HeroCard(
                             text = stringResource(R.string.hero_badge),
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = PaleGold,
+                                color = if (colors.isDark) colors.lightGold else PaleGold,
                                 letterSpacing = 1.2.sp
                             )
                         )
@@ -151,7 +171,7 @@ fun HeroCard(
                             fontFamily = ArabicFontFamily,
                             fontSize = 30.sp,
                             fontWeight = FontWeight.Bold,
-                            color = BrightGold,
+                            color = colors.lightGold,
                             textAlign = TextAlign.Center,
                             textDirection = TextDirection.Rtl,
                             lineHeight = 42.sp
@@ -167,7 +187,7 @@ fun HeroCard(
                     text = stringResource(R.string.hero_title),
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.Bold,
-                        color = TextOnDark,
+                        color = colors.textOnBackground,
                         letterSpacing = 0.5.sp
                     ),
                     textAlign = TextAlign.Center
@@ -179,7 +199,7 @@ fun HeroCard(
                 Text(
                     text = stringResource(R.string.hero_subtitle),
                     style = MaterialTheme.typography.bodyMedium.copy(
-                        color = TextOnDarkSecondary,
+                        color = colors.textOnBackgroundSecondary,
                         fontWeight = FontWeight.Medium,
                         letterSpacing = 0.8.sp
                     ),

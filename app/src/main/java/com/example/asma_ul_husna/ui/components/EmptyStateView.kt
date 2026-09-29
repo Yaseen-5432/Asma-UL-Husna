@@ -23,10 +23,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.asma_ul_husna.ui.theme.BrightGold
-import com.example.asma_ul_husna.ui.theme.PrimaryPurple
-import com.example.asma_ul_husna.ui.theme.TextOnDark
-import com.example.asma_ul_husna.ui.theme.TextOnDarkSecondary
+import com.example.asma_ul_husna.ui.theme.appColors
 
 @Composable
 fun EmptyStateView(
@@ -35,6 +32,8 @@ fun EmptyStateView(
     modifier: Modifier = Modifier,
     icon: ImageVector = Icons.Outlined.SearchOff
 ) {
+    val colors = MaterialTheme.appColors
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -45,13 +44,16 @@ fun EmptyStateView(
         Box(
             modifier = Modifier
                 .size(72.dp)
-                .background(Color.White.copy(alpha = 0.08f), shape = CircleShape),
+                .background(
+                    if (colors.isDark) colors.cardBackground else Color.White.copy(alpha = 0.08f),
+                    shape = CircleShape
+                ),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = BrightGold,
+                tint = colors.lightGold,
                 modifier = Modifier.size(36.dp)
             )
         }
@@ -62,7 +64,7 @@ fun EmptyStateView(
             text = title,
             style = MaterialTheme.typography.titleLarge.copy(
                 fontWeight = FontWeight.Bold,
-                color = TextOnDark
+                color = colors.textOnBackground
             ),
             textAlign = TextAlign.Center
         )
@@ -72,7 +74,7 @@ fun EmptyStateView(
         Text(
             text = description,
             style = MaterialTheme.typography.bodyMedium.copy(
-                color = TextOnDarkSecondary
+                color = colors.textOnBackgroundSecondary
             ),
             textAlign = TextAlign.Center
         )

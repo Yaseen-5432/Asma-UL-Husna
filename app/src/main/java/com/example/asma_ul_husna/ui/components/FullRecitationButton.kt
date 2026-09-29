@@ -51,6 +51,7 @@ import com.example.asma_ul_husna.ui.theme.DeepIndigoDark
 import com.example.asma_ul_husna.ui.theme.IslamicGold
 import com.example.asma_ul_husna.ui.theme.PrimaryPurple
 import com.example.asma_ul_husna.ui.theme.PrimaryPurpleLight
+import com.example.asma_ul_husna.ui.theme.appColors
 
 /**
  * Compact, modern, and attractive action button for Full Recitation.
@@ -64,6 +65,7 @@ fun FullRecitationButton(
     onToggleRecitation: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val colors = MaterialTheme.appColors
     val infiniteTransition = rememberInfiniteTransition(label = "recitationButtonPulse")
 
     val pulseGlow by infiniteTransition.animateFloat(
@@ -88,54 +90,80 @@ fun FullRecitationButton(
 
     val currentScale = if (isPlaying) buttonScale else 1.0f
 
+    val buttonBorder = if (colors.isDark) {
+        BorderStroke(1.dp, if (isPlaying) colors.primaryGold else colors.primaryGold.copy(alpha = 0.8f))
+    } else {
+        null
+    }
+
+    val backgroundBrush = if (colors.isDark) {
+        if (isPlaying) {
+            Brush.horizontalGradient(
+                colors = listOf(
+                    colors.primaryIndigo,
+                    colors.primaryIndigo.copy(alpha = 0.85f),
+                    colors.primaryIndigo
+                )
+            )
+        } else {
+            Brush.horizontalGradient(
+                colors = listOf(
+                    colors.elevatedCardBackground,
+                    colors.elevatedCardBackground
+                )
+            )
+        }
+    } else {
+        if (isPlaying) {
+            Brush.horizontalGradient(
+                colors = listOf(
+                    PrimaryPurple,
+                    PrimaryPurpleLight,
+                    PrimaryPurple
+                )
+            )
+        } else if (isPaused) {
+            Brush.horizontalGradient(
+                colors = listOf(
+                    PrimaryPurple.copy(alpha = 0.9f),
+                    DeepIndigoDark
+                )
+            )
+        } else {
+            Brush.horizontalGradient(
+                colors = listOf(
+                    PrimaryPurple,
+                    PrimaryPurple.copy(alpha = 0.85f)
+                )
+            )
+        }
+    }
+
     Surface(
         onClick = onToggleRecitation,
         shape = RoundedCornerShape(20.dp),
         color = Color.Transparent,
+        border = buttonBorder,
         modifier = modifier
             .fillMaxWidth()
             .scale(currentScale)
             .shadow(
                 elevation = if (isPlaying) 10.dp else 4.dp,
                 shape = RoundedCornerShape(20.dp),
-                ambientColor = if (isPlaying) BrightGold.copy(alpha = 0.4f) else Color(0x1A000000),
-                spotColor = if (isPlaying) IslamicGold else Color(0x33000000)
+                ambientColor = if (isPlaying) colors.lightGold.copy(alpha = 0.4f) else Color(0x1A000000),
+                spotColor = if (isPlaying) colors.primaryGold else Color(0x33000000)
             )
             .clip(RoundedCornerShape(20.dp))
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(
-                    if (isPlaying) {
-                        Brush.horizontalGradient(
-                            colors = listOf(
-                                PrimaryPurple,
-                                PrimaryPurpleLight,
-                                PrimaryPurple
-                            )
-                        )
-                    } else if (isPaused) {
-                        Brush.horizontalGradient(
-                            colors = listOf(
-                                PrimaryPurple.copy(alpha = 0.9f),
-                                DeepIndigoDark
-                            )
-                        )
-                    } else {
-                        Brush.horizontalGradient(
-                            colors = listOf(
-                                PrimaryPurple,
-                                PrimaryPurple.copy(alpha = 0.85f)
-                            )
-                        )
-                    }
-                )
+                .background(backgroundBrush)
                 .background(
                     if (isPlaying) {
                         Brush.radialGradient(
                             colors = listOf(
-                                BrightGold.copy(alpha = 0.25f * pulseGlow),
+                                colors.lightGold.copy(alpha = 0.25f * pulseGlow),
                                 Color.Transparent
                             )
                         )
@@ -152,7 +180,7 @@ fun FullRecitationButton(
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(
-                        color = BrightGold,
+                        color = colors.lightGold,
                         strokeWidth = 2.dp,
                         modifier = Modifier.size(18.dp)
                     )
@@ -161,7 +189,7 @@ fun FullRecitationButton(
                         text = stringResource(R.string.action_loading_audio),
                         style = MaterialTheme.typography.titleSmall.copy(
                             fontWeight = FontWeight.Bold,
-                            color = BrightGold,
+                            color = colors.lightGold,
                             letterSpacing = 0.3.sp
                         )
                     )
@@ -171,7 +199,7 @@ fun FullRecitationButton(
                         modifier = Modifier
                             .size(28.dp)
                             .background(
-                                color = if (isPlaying) BrightGold else Color.White.copy(alpha = 0.15f),
+                                color = if (isPlaying) colors.lightGold else (if (colors.isDark) colors.primaryGold.copy(alpha = 0.25f) else Color.White.copy(alpha = 0.15f)),
                                 shape = CircleShape
                             ),
                         contentAlignment = Alignment.Center
@@ -188,7 +216,7 @@ fun FullRecitationButton(
                                     else -> Icons.Filled.PlayArrow
                                 },
                                 contentDescription = null,
-                                tint = if (isPlaying) DeepIndigoDark else BrightGold,
+                                tint = if (isPlaying) (if (colors.isDark) Color(0xFF17142B) else DeepIndigoDark) else colors.lightGold,
                                 modifier = Modifier.size(16.dp)
                             )
                         }
@@ -204,7 +232,7 @@ fun FullRecitationButton(
                         },
                         style = MaterialTheme.typography.titleSmall.copy(
                             fontWeight = FontWeight.Bold,
-                            color = if (isPlaying) BrightGold else Color.White,
+                            color = if (isPlaying) colors.lightGold else (if (colors.isDark) colors.lightGold else Color.White),
                             letterSpacing = 0.4.sp
                         )
                     )
@@ -214,7 +242,7 @@ fun FullRecitationButton(
                         Icon(
                             imageVector = Icons.Filled.GraphicEq,
                             contentDescription = null,
-                            tint = BrightGold,
+                            tint = colors.lightGold,
                             modifier = Modifier.size(18.dp)
                         )
                     }

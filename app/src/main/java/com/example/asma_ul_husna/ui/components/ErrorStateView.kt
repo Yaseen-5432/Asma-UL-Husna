@@ -29,9 +29,7 @@ import androidx.compose.ui.unit.dp
 import com.example.asma_ul_husna.R
 import com.example.asma_ul_husna.ui.theme.FavoriteRed
 import com.example.asma_ul_husna.ui.theme.FavoriteRedSoft
-import com.example.asma_ul_husna.ui.theme.PrimaryPurple
-import com.example.asma_ul_husna.ui.theme.TextOnDark
-import com.example.asma_ul_husna.ui.theme.TextOnDarkSecondary
+import com.example.asma_ul_husna.ui.theme.appColors
 
 @Composable
 fun ErrorStateView(
@@ -39,6 +37,8 @@ fun ErrorStateView(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val colors = MaterialTheme.appColors
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -66,7 +66,7 @@ fun ErrorStateView(
             text = message,
             style = MaterialTheme.typography.titleLarge.copy(
                 fontWeight = FontWeight.Bold,
-                color = TextOnDark
+                color = colors.textOnBackground
             ),
             textAlign = TextAlign.Center
         )
@@ -77,7 +77,7 @@ fun ErrorStateView(
             onClick = onRetry,
             shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = PrimaryPurple,
+                containerColor = colors.primaryIndigo,
                 contentColor = Color.White
             )
         ) {

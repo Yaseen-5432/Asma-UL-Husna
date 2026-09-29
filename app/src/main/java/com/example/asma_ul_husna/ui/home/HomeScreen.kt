@@ -44,6 +44,7 @@ import com.example.asma_ul_husna.ui.components.RecitationPresentationOverlay
 import com.example.asma_ul_husna.ui.theme.BrightGold
 import com.example.asma_ul_husna.ui.theme.DeepIndigo
 import com.example.asma_ul_husna.ui.theme.TextOnDarkMuted
+import com.example.asma_ul_husna.ui.theme.appColors
 
 @Composable
 fun HomeScreen(
@@ -60,6 +61,7 @@ fun HomeScreen(
         onNameClick = onNameClick,
         onFavoriteToggle = viewModel::onFavoriteToggle,
         onToggleRecitation = viewModel::toggleFullRecitation,
+        onStopRecitation = viewModel::stopFullRecitation,
         onRetry = viewModel::loadNames,
         modifier = modifier
     )
@@ -73,6 +75,7 @@ fun HomeScreenContent(
     onNameClick: (Int) -> Unit,
     onFavoriteToggle: (Int) -> Unit,
     onToggleRecitation: () -> Unit,
+    onStopRecitation: () -> Unit = {},
     onRetry: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -109,10 +112,12 @@ fun HomeScreenContent(
         }
     }
 
+    val colors = MaterialTheme.appColors
+
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(DeepIndigo)
+            .background(colors.mainBackground)
     ) {
         if (uiState.isLoading) {
             Column(
@@ -121,14 +126,14 @@ fun HomeScreenContent(
                 verticalArrangement = Arrangement.Center
             ) {
                 CircularProgressIndicator(
-                    color = BrightGold,
+                    color = colors.lightGold,
                     strokeWidth = 3.dp
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = stringResource(R.string.loading_names),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = TextOnDarkMuted
+                    color = colors.textMuted
                 )
             }
         } else if (uiState.error != null) {
@@ -250,7 +255,8 @@ fun HomeScreenContent(
             isPlaying = uiState.isRecitationPlaying,
             isPaused = uiState.isRecitationPaused,
             onTogglePlayPause = onToggleRecitation,
-            onDismiss = onToggleRecitation,
+            onDismiss = onStopRecitation,
+  //          onDismiss = onToggleRecitation,
             onNameClick = onNameClick
         )
     }

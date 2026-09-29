@@ -1,5 +1,6 @@
 package com.example.asma_ul_husna.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -33,10 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.example.asma_ul_husna.R
-import com.example.asma_ul_husna.ui.theme.CardWhite
-import com.example.asma_ul_husna.ui.theme.PrimaryPurple
-import com.example.asma_ul_husna.ui.theme.TextPrimary
-import com.example.asma_ul_husna.ui.theme.TextSecondary
+import com.example.asma_ul_husna.ui.theme.appColors
 
 /**
  * Modern large rounded search field with soft shadow and clean typography.
@@ -47,6 +45,7 @@ fun AppSearchBar(
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val colors = MaterialTheme.appColors
     val focusManager = LocalFocusManager.current
 
     Card(
@@ -56,11 +55,12 @@ fun AppSearchBar(
             .shadow(
                 elevation = 4.dp,
                 shape = RoundedCornerShape(26.dp),
-                ambientColor = Color(0x10000000),
-                spotColor = Color(0x1A000000)
+                ambientColor = if (colors.isDark) Color(0x22000000) else Color(0x10000000),
+                spotColor = if (colors.isDark) Color(0x33000000) else Color(0x1A000000)
             ),
         shape = RoundedCornerShape(26.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        colors = CardDefaults.cardColors(containerColor = colors.searchBarBg),
+        border = if (colors.isDark) BorderStroke(1.dp, colors.borderSubtle) else null,
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Row(
@@ -73,7 +73,7 @@ fun AppSearchBar(
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = stringResource(R.string.search_placeholder),
-                tint = PrimaryPurple,
+                tint = colors.searchBarIcon,
                 modifier = Modifier.size(20.dp)
             )
 
@@ -87,7 +87,7 @@ fun AppSearchBar(
                     Text(
                         text = stringResource(R.string.search_placeholder),
                         style = MaterialTheme.typography.bodyMedium.copy(
-                            color = TextSecondary.copy(alpha = 0.8f),
+                            color = colors.searchBarPlaceholder,
                             fontWeight = FontWeight.Normal
                         )
                     )
@@ -98,10 +98,10 @@ fun AppSearchBar(
                     onValueChange = onQueryChange,
                     singleLine = true,
                     textStyle = MaterialTheme.typography.bodyMedium.copy(
-                        color = TextPrimary,
+                        color = colors.searchBarText,
                         fontWeight = FontWeight.Medium
                     ),
-                    cursorBrush = SolidColor(PrimaryPurple),
+                    cursorBrush = SolidColor(colors.primaryIndigo),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                     keyboardActions = KeyboardActions(onSearch = { focusManager.clearFocus() }),
                     modifier = Modifier.fillMaxWidth()
@@ -116,7 +116,7 @@ fun AppSearchBar(
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = stringResource(R.string.search_clear),
-                        tint = TextSecondary,
+                        tint = colors.searchBarIcon,
                         modifier = Modifier.size(18.dp)
                     )
                 }
