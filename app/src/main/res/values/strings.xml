@@ -5,13 +5,37 @@
     <string name="header_title">Asma-ul-Husna</string>
     <string name="header_subtitle">Explore the 99 Beautiful Names of Allah</string>
 
+    <!-- Hero Section -->
+    <string name="hero_badge">✦ ASMA-UL-HUSNA</string>
+    <string name="hero_title">99 Beautiful Names</string>
+    <string name="hero_subtitle">Discover • Reflect • Listen</string>
+    <string name="hero_arabic">أَسْمَاءُ اللهِ الْحُسْنَى</string>
+
+    <!-- Quick Actions -->
+    <string name="quick_actions_title">Quick Actions</string>
+    <string name="quick_action_recitation">Full Recitation</string>
+    <string name="quick_action_recitation_desc">Rhythmic recitation</string>
+    <string name="quick_action_favorites">Favorites</string>
+    <string name="quick_action_favorites_desc">Saved names</string>
+
+    <!-- Featured Name -->
+    <string name="featured_name_badge">✦ NAME OF THE DAY</string>
+    <string name="action_view_details">View Details</string>
+
+    <!-- Filter Chips -->
+    <string name="filter_all">All (99)</string>
+    <string name="filter_part1">1 – 33</string>
+    <string name="filter_part2">34 – 66</string>
+    <string name="filter_part3">67 – 99</string>
+    <string name="filter_favorites">Favorites</string>
+
     <!-- Navigation -->
     <string name="nav_home">Home</string>
     <string name="nav_favorites">Favorites</string>
     <string name="nav_settings">Settings</string>
 
     <!-- Search -->
-    <string name="search_placeholder">Search names...</string>
+    <string name="search_placeholder">Search the 99 Names…</string>
     <string name="search_clear">Clear search</string>
     <string name="search_no_results">No names found</string>
     <string name="search_no_results_desc">Try searching with a different English, Arabic, or Urdu keyword</string>

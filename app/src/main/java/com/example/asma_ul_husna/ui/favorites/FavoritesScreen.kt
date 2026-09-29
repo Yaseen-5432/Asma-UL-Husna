@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,10 +15,12 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -31,9 +34,12 @@ import com.example.asma_ul_husna.R
 import com.example.asma_ul_husna.ui.components.EmptyStateView
 import com.example.asma_ul_husna.ui.components.ErrorStateView
 import com.example.asma_ul_husna.ui.components.NameCard
-import com.example.asma_ul_husna.ui.theme.DeepNavy
+import com.example.asma_ul_husna.ui.theme.BrightGold
+import com.example.asma_ul_husna.ui.theme.DeepIndigo
 import com.example.asma_ul_husna.ui.theme.IslamicGold
-import com.example.asma_ul_husna.ui.theme.TextPrimary
+import com.example.asma_ul_husna.ui.theme.PrimaryPurple
+import com.example.asma_ul_husna.ui.theme.TextOnDark
+import com.example.asma_ul_husna.ui.theme.TextOnDarkSecondary
 
 @Composable
 fun FavoritesScreen(
@@ -63,11 +69,11 @@ fun FavoritesContent(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(DeepNavy)
+            .background(DeepIndigo)
     ) {
         if (uiState.isLoading) {
             CircularProgressIndicator(
-                color = IslamicGold,
+                color = BrightGold,
                 modifier = Modifier.align(Alignment.Center)
             )
         } else if (uiState.error != null) {
@@ -85,38 +91,55 @@ fun FavoritesContent(
             )
         } else {
             LazyVerticalGrid(
-                columns = GridCells.Adaptive(minSize = 150.dp),
+                columns = GridCells.Adaptive(minSize = 156.dp),
                 contentPadding = PaddingValues(
-                    start = 16.dp,
-                    end = 16.dp,
-                    top = 16.dp,
+                    start = 18.dp,
+                    end = 18.dp,
+                    top = 18.dp,
                     bottom = 96.dp
                 ),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(14.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
                 item(span = { GridItemSpan(maxLineSpan) }) {
-                    Column(
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 8.dp)
+                            .padding(bottom = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = stringResource(R.string.favorites_title),
-                            style = MaterialTheme.typography.headlineMedium.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = TextPrimary
+                        Column {
+                            Text(
+                                text = stringResource(R.string.favorites_title),
+                                style = MaterialTheme.typography.headlineMedium.copy(
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = TextOnDark
+                                )
                             )
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = "${uiState.favoriteNames.size} / 99",
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                fontWeight = FontWeight.SemiBold,
-                                color = IslamicGold
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = "${uiState.favoriteNames.size} saved",
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    color = TextOnDarkSecondary
+                                )
                             )
-                        )
+                        }
+
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = PrimaryPurple.copy(alpha = 0.35f)
+                        ) {
+                            Text(
+                                text = "${uiState.favoriteNames.size} / 99",
+                                style = MaterialTheme.typography.labelLarge.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = BrightGold
+                                ),
+                                modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
+                            )
+                        }
                     }
                 }
 
@@ -135,4 +158,3 @@ fun FavoritesContent(
         }
     }
 }
-

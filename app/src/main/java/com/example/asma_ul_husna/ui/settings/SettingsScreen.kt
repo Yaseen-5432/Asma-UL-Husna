@@ -1,6 +1,5 @@
 package com.example.asma_ul_husna.ui.settings
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -30,12 +29,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -44,11 +47,15 @@ import androidx.compose.ui.unit.sp
 import com.example.asma_ul_husna.R
 import com.example.asma_ul_husna.data.model.AppLanguage
 import com.example.asma_ul_husna.data.model.AppTheme
-import com.example.asma_ul_husna.ui.theme.BrightGold
-import com.example.asma_ul_husna.ui.theme.DeepNavy
-import com.example.asma_ul_husna.ui.theme.GlassBorder
-import com.example.asma_ul_husna.ui.theme.GlassSurface
+import com.example.asma_ul_husna.ui.theme.AccentGold
+import com.example.asma_ul_husna.ui.theme.AccentGoldBg
+import com.example.asma_ul_husna.ui.theme.AccentPurple
+import com.example.asma_ul_husna.ui.theme.AccentPurpleBg
+import com.example.asma_ul_husna.ui.theme.CardWhite
+import com.example.asma_ul_husna.ui.theme.DeepIndigo
 import com.example.asma_ul_husna.ui.theme.IslamicGold
+import com.example.asma_ul_husna.ui.theme.PrimaryPurple
+import com.example.asma_ul_husna.ui.theme.TextOnDark
 import com.example.asma_ul_husna.ui.theme.TextPrimary
 import com.example.asma_ul_husna.ui.theme.TextSecondary
 
@@ -79,7 +86,7 @@ fun SettingsContent(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(DeepNavy)
+            .background(DeepIndigo)
     ) {
         Column(
             modifier = Modifier
@@ -91,38 +98,40 @@ fun SettingsContent(
             // Header
             Text(
                 text = stringResource(R.string.settings_title),
-                style = MaterialTheme.typography.headlineMedium.copy(
-                    fontWeight = FontWeight.Bold,
-                    color = TextPrimary
+                style = MaterialTheme.typography.displaySmall.copy(
+                    fontWeight = FontWeight.ExtraBold,
+                    color = TextOnDark
                 )
             )
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Appearance Section
-            SettingsSectionCard(
+            // 1. Appearance / Theme Card (Modern White Card)
+            SettingsCard(
                 title = stringResource(R.string.settings_theme_section),
-                icon = Icons.Outlined.Palette
+                icon = Icons.Outlined.Palette,
+                iconTint = PrimaryPurple,
+                iconBg = AccentPurpleBg
             ) {
                 Column {
                     ThemeOptionRow(
                         title = stringResource(R.string.settings_theme_system),
                         icon = Icons.Outlined.SettingsBrightness,
-                        isSelected = uiState.currentTheme == AppTheme.SYSTEM,
+                        selected = uiState.currentTheme == AppTheme.SYSTEM,
                         onClick = { onThemeSelected(AppTheme.SYSTEM) }
                     )
 
                     ThemeOptionRow(
                         title = stringResource(R.string.settings_theme_dark),
                         icon = Icons.Outlined.DarkMode,
-                        isSelected = uiState.currentTheme == AppTheme.DARK,
+                        selected = uiState.currentTheme == AppTheme.DARK,
                         onClick = { onThemeSelected(AppTheme.DARK) }
                     )
 
                     ThemeOptionRow(
                         title = stringResource(R.string.settings_theme_light),
                         icon = Icons.Outlined.LightMode,
-                        isSelected = uiState.currentTheme == AppTheme.LIGHT,
+                        selected = uiState.currentTheme == AppTheme.LIGHT,
                         onClick = { onThemeSelected(AppTheme.LIGHT) }
                     )
                 }
@@ -130,21 +139,32 @@ fun SettingsContent(
 
             Spacer(modifier = Modifier.height(18.dp))
 
-            // Language Section
-            SettingsSectionCard(
+            // 2. Language Card (Modern White Card)
+            SettingsCard(
                 title = stringResource(R.string.settings_language_section),
-                icon = Icons.Outlined.Language
+                icon = Icons.Outlined.Language,
+                iconTint = IslamicGold,
+                iconBg = AccentGoldBg
             ) {
                 Column {
                     LanguageOptionRow(
+                        title = stringResource(R.string.settings_theme_system),
+                        subtitle = "System Default",
+                        selected = uiState.currentLanguage == AppLanguage.SYSTEM,
+                        onClick = { onLanguageSelected(AppLanguage.SYSTEM) }
+                    )
+
+                    LanguageOptionRow(
                         title = stringResource(R.string.settings_language_en),
-                        isSelected = uiState.currentLanguage == AppLanguage.ENGLISH || uiState.currentLanguage == AppLanguage.SYSTEM,
+                        subtitle = "English",
+                        selected = uiState.currentLanguage == AppLanguage.ENGLISH,
                         onClick = { onLanguageSelected(AppLanguage.ENGLISH) }
                     )
 
                     LanguageOptionRow(
                         title = stringResource(R.string.settings_language_ur),
-                        isSelected = uiState.currentLanguage == AppLanguage.URDU,
+                        subtitle = "اردو",
+                        selected = uiState.currentLanguage == AppLanguage.URDU,
                         onClick = { onLanguageSelected(AppLanguage.URDU) }
                     )
                 }
@@ -152,37 +172,25 @@ fun SettingsContent(
 
             Spacer(modifier = Modifier.height(18.dp))
 
-            // About Section
-            SettingsSectionCard(
+            // 3. About Card (Modern White Card)
+            SettingsCard(
                 title = stringResource(R.string.settings_about_section),
-                icon = Icons.Outlined.Info
+                icon = Icons.Outlined.Info,
+                iconTint = PrimaryPurple,
+                iconBg = AccentPurpleBg
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = stringResource(R.string.app_name),
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = BrightGold
-                        )
-                    )
-                    Text(
-                        text = stringResource(R.string.app_subtitle),
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            color = TextSecondary
-                        )
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
+                Column(
+                    modifier = Modifier.padding(top = 4.dp)
+                ) {
                     Text(
                         text = stringResource(R.string.settings_about_description),
                         style = MaterialTheme.typography.bodyMedium.copy(
-                            color = TextPrimary,
+                            color = TextSecondary,
                             lineHeight = 22.sp
                         )
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(14.dp))
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -191,17 +199,25 @@ fun SettingsContent(
                     ) {
                         Text(
                             text = stringResource(R.string.settings_version_label),
-                            style = MaterialTheme.typography.labelMedium.copy(
-                                color = TextSecondary
+                            style = MaterialTheme.typography.labelLarge.copy(
+                                fontWeight = FontWeight.SemiBold,
+                                color = TextPrimary
                             )
                         )
-                        Text(
-                            text = stringResource(R.string.settings_version_value),
-                            style = MaterialTheme.typography.labelMedium.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = IslamicGold
+
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = AccentPurpleBg
+                        ) {
+                            Text(
+                                text = "v${stringResource(R.string.settings_version_value)}",
+                                style = MaterialTheme.typography.labelMedium.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = PrimaryPurple
+                                ),
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                             )
-                        )
+                        }
                     }
                 }
             }
@@ -210,32 +226,50 @@ fun SettingsContent(
 }
 
 @Composable
-fun SettingsSectionCard(
+fun SettingsCard(
     title: String,
     icon: ImageVector,
+    iconTint: Color,
+    iconBg: Color,
     content: @Composable () -> Unit
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = GlassSurface),
-        border = BorderStroke(1.dp, GlassBorder),
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(
+                elevation = 6.dp,
+                shape = RoundedCornerShape(22.dp),
+                ambientColor = Color(0x14000000),
+                spotColor = Color(0x1F000000)
+            ),
+        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(containerColor = CardWhite),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(18.dp)
+        ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 14.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = IslamicGold,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(10.dp))
+                Box(
+                    modifier = Modifier
+                        .size(36.dp)
+                        .background(iconBg, shape = RoundedCornerShape(10.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = iconTint,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium.copy(
@@ -245,12 +279,7 @@ fun SettingsSectionCard(
                 )
             }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(1.dp)
-                    .background(IslamicGold.copy(alpha = 0.15f))
-            )
+            Spacer(modifier = Modifier.height(12.dp))
 
             content()
         }
@@ -261,39 +290,40 @@ fun SettingsSectionCard(
 fun ThemeOptionRow(
     title: String,
     icon: ImageVector,
-    isSelected: Boolean,
+    selected: Boolean,
     onClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+            .padding(vertical = 8.dp, horizontal = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = if (isSelected) IslamicGold else TextSecondary,
-                modifier = Modifier.size(20.dp)
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            Text(
-                text = title,
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                    color = if (isSelected) TextPrimary else TextSecondary
-                )
-            )
-        }
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = if (selected) PrimaryPurple else TextSecondary,
+            modifier = Modifier.size(20.dp)
+        )
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodyMedium.copy(
+                fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+                color = if (selected) TextPrimary else TextSecondary
+            ),
+            modifier = Modifier.weight(1f)
+        )
 
         RadioButton(
-            selected = isSelected,
+            selected = selected,
             onClick = onClick,
             colors = RadioButtonDefaults.colors(
-                selectedColor = IslamicGold,
+                selectedColor = PrimaryPurple,
                 unselectedColor = TextSecondary.copy(alpha = 0.5f)
             )
         )
@@ -303,33 +333,43 @@ fun ThemeOptionRow(
 @Composable
 fun LanguageOptionRow(
     title: String,
-    isSelected: Boolean,
+    subtitle: String,
+    selected: Boolean,
     onClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+            .padding(vertical = 8.dp, horizontal = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.bodyLarge.copy(
-                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                color = if (isSelected) TextPrimary else TextSecondary
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+                    color = if (selected) TextPrimary else TextSecondary
+                )
             )
-        )
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodySmall.copy(
+                    color = TextSecondary.copy(alpha = 0.7f)
+                )
+            )
+        }
 
         RadioButton(
-            selected = isSelected,
+            selected = selected,
             onClick = onClick,
             colors = RadioButtonDefaults.colors(
-                selectedColor = IslamicGold,
+                selectedColor = PrimaryPurple,
                 unselectedColor = TextSecondary.copy(alpha = 0.5f)
             )
         )
     }
 }
-

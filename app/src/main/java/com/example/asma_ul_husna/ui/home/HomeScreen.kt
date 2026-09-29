@@ -24,19 +24,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.asma_ul_husna.R
 import com.example.asma_ul_husna.ui.components.AppSearchBar
+import com.example.asma_ul_husna.ui.components.CategoryChipsRow
 import com.example.asma_ul_husna.ui.components.EmptyStateView
 import com.example.asma_ul_husna.ui.components.ErrorStateView
+import com.example.asma_ul_husna.ui.components.FeaturedNameCard
+import com.example.asma_ul_husna.ui.components.FullRecitationButton
 import com.example.asma_ul_husna.ui.components.HeaderSection
+import com.example.asma_ul_husna.ui.components.HeroCard
 import com.example.asma_ul_husna.ui.components.NameCard
-import com.example.asma_ul_husna.ui.theme.DeepNavy
-import com.example.asma_ul_husna.ui.theme.IslamicGold
-import com.example.asma_ul_husna.ui.theme.TextSecondary
+import com.example.asma_ul_husna.ui.components.NameFilterType
+import com.example.asma_ul_husna.ui.components.RecitationPresentationOverlay
+import com.example.asma_ul_husna.ui.theme.BrightGold
+import com.example.asma_ul_husna.ui.theme.DeepIndigo
+import com.example.asma_ul_husna.ui.theme.TextOnDarkMuted
 
 @Composable
 fun HomeScreen(
@@ -49,6 +56,7 @@ fun HomeScreen(
     HomeScreenContent(
         uiState = uiState,
         onSearchQueryChanged = viewModel::onSearchQueryChanged,
+        onFilterSelected = viewModel::onFilterSelected,
         onNameClick = onNameClick,
         onFavoriteToggle = viewModel::onFavoriteToggle,
         onToggleRecitation = viewModel::toggleFullRecitation,
@@ -61,6 +69,7 @@ fun HomeScreen(
 fun HomeScreenContent(
     uiState: NamesUiState,
     onSearchQueryChanged: (String) -> Unit,
+    onFilterSelected: (NameFilterType) -> Unit,
     onNameClick: (Int) -> Unit,
     onFavoriteToggle: (Int) -> Unit,
     onToggleRecitation: () -> Unit,
@@ -68,16 +77,34 @@ fun HomeScreenContent(
     modifier: Modifier = Modifier
 ) {
     val gridState = rememberLazyGridState()
+    val activeId = uiState.recitationCurrentNameId
+    val isRecitationActive = activeId != null
 
-    // Synchronized auto-scroll: fires only when active Name ID changes (1-50)
-    LaunchedEffect(uiState.recitationCurrentNameId) {
-        val activeId = uiState.recitationCurrentNameId
+    // Find the currently recited Name object from the full dataset
+    val currentActiveName = remember(activeId, uiState.names) {
+        if (activeId != null) uiState.names.firstOrNull { it.id == activeId } else null
+    }
+
+    // Synchronized background grid centering during full recitation
+    LaunchedEffect(activeId) {
         if (activeId != null) {
             val itemIndex = uiState.filteredNames.indexOfFirst { it.id == activeId }
             if (itemIndex != -1) {
-                // Offset by 2 due to HeaderSection (0) and AppSearchBar (1)
-                val targetGridIndex = itemIndex + 2
-                gridState.animateScrollToItem(targetGridIndex)
+                // Stable offset count for header items
+                val headerOffsetCount = 6
+                val targetGridIndex = itemIndex + headerOffsetCount
+
+                val viewportHeight = gridState.layoutInfo.viewportSize.height
+                val visibleItemHeight = gridState.layoutInfo.visibleItemsInfo
+                    .firstOrNull { it.index == targetGridIndex }?.size?.height
+                    ?: gridState.layoutInfo.visibleItemsInfo.firstOrNull { it.index >= headerOffsetCount }?.size?.height
+                    ?: 360
+                val centerOffset = -((viewportHeight - visibleItemHeight) / 2).coerceAtLeast(0)
+
+                gridState.animateScrollToItem(
+                    index = targetGridIndex,
+                    scrollOffset = centerOffset
+                )
             }
         }
     }
@@ -85,7 +112,7 @@ fun HomeScreenContent(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(DeepNavy)
+            .background(DeepIndigo)
     ) {
         if (uiState.isLoading) {
             Column(
@@ -94,14 +121,14 @@ fun HomeScreenContent(
                 verticalArrangement = Arrangement.Center
             ) {
                 CircularProgressIndicator(
-                    color = IslamicGold,
+                    color = BrightGold,
                     strokeWidth = 3.dp
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = stringResource(R.string.loading_names),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = TextSecondary
+                    color = TextOnDarkMuted
                 )
             }
         } else if (uiState.error != null) {
@@ -113,40 +140,76 @@ fun HomeScreenContent(
         } else {
             LazyVerticalGrid(
                 state = gridState,
-                columns = GridCells.Adaptive(minSize = 150.dp),
+                columns = GridCells.Adaptive(minSize = 156.dp),
                 contentPadding = PaddingValues(
-                    start = 16.dp,
-                    end = 16.dp,
-                    top = 16.dp,
+                    start = 18.dp,
+                    end = 18.dp,
+                    top = 18.dp,
                     bottom = 96.dp
                 ),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(14.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
-                // Header Section with Full Recitation Controls
-                item(span = { GridItemSpan(maxLineSpan) }) {
+                // 1. Confident Top Header (Stable Key)
+                item(key = "header_section", span = { GridItemSpan(maxLineSpan) }) {
                     HeaderSection(
+                        modifier = Modifier.padding(bottom = 6.dp)
+                    )
+                }
+
+                // 2. Modern Hero Card (Stable Key)
+                item(key = "hero_card", span = { GridItemSpan(maxLineSpan) }) {
+                    HeroCard(
+                        modifier = Modifier.padding(bottom = 6.dp)
+                    )
+                }
+
+                // 3. Featured Name of the Day (Stable Key)
+                uiState.featuredName?.let { featured ->
+                    item(key = "featured_name_card", span = { GridItemSpan(maxLineSpan) }) {
+                        FeaturedNameCard(
+                            name = featured,
+                            isFavorite = uiState.favoriteIds.contains(featured.id),
+                            onNameClick = onNameClick,
+                            onFavoriteToggle = onFavoriteToggle,
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        )
+                    }
+                }
+
+                // 4. Compact Modern Full Recitation Button (Directly under Name of the Day - Stable Key)
+                item(key = "full_recitation_button", span = { GridItemSpan(maxLineSpan) }) {
+                    FullRecitationButton(
                         isPlaying = uiState.isRecitationPlaying,
                         isPaused = uiState.isRecitationPaused,
                         isLoading = uiState.isRecitationLoading,
                         onToggleRecitation = onToggleRecitation,
-                        modifier = Modifier.padding(bottom = 12.dp)
+                        modifier = Modifier.padding(bottom = 6.dp)
                     )
                 }
 
-                // Search Bar
-                item(span = { GridItemSpan(maxLineSpan) }) {
+                // 5. Modern Search Bar (Stable Key - Never shifted/disposed during typing)
+                item(key = "app_search_bar", span = { GridItemSpan(maxLineSpan) }) {
                     AppSearchBar(
                         query = uiState.searchQuery,
                         onQueryChange = onSearchQueryChanged,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom = 4.dp)
                     )
                 }
 
-                // Empty state if search returns nothing
+                // 6. Modern Category / Range Filter Chips (Stable Key)
+                item(key = "category_filter_chips", span = { GridItemSpan(maxLineSpan) }) {
+                    CategoryChipsRow(
+                        selectedFilter = uiState.selectedFilter,
+                        onFilterSelected = onFilterSelected,
+                        modifier = Modifier.padding(bottom = 6.dp)
+                    )
+                }
+
+                // Empty State if search or filter returns nothing
                 if (uiState.filteredNames.isEmpty()) {
-                    item(span = { GridItemSpan(maxLineSpan) }) {
+                    item(key = "empty_state", span = { GridItemSpan(maxLineSpan) }) {
                         EmptyStateView(
                             title = stringResource(R.string.search_no_results),
                             description = stringResource(R.string.search_no_results_desc),
@@ -155,15 +218,22 @@ fun HomeScreenContent(
                         )
                     }
                 } else {
-                    // 99 Names Grid Cards with Highlighting
+                    // 99 Names Grid with Modern Cards
                     items(
                         items = uiState.filteredNames,
-                        key = { it.id }
+                        key = { "name_card_${it.id}" }
                     ) { name ->
+                        val isHighlighted = activeId == name.id
+                        val relativePosition = if (activeId != null) name.id - activeId else 0
+
                         NameCard(
                             name = name,
                             isFavorite = uiState.favoriteIds.contains(name.id),
-                            isHighlighted = uiState.recitationCurrentNameId == name.id,
+                            isHighlighted = isHighlighted,
+                            isRecitationActive = isRecitationActive,
+                            isPlaying = uiState.isRecitationPlaying,
+                            isPaused = uiState.isRecitationPaused,
+                            relativePosition = relativePosition,
                             onCardClick = { onNameClick(name.id) },
                             onFavoriteToggle = { onFavoriteToggle(name.id) }
                         )
@@ -171,5 +241,17 @@ fun HomeScreenContent(
                 }
             }
         }
+
+        // =========================================================================
+        // Dedicated Floating 3D Centerpiece Presentation Layer for Full Recitation
+        // =========================================================================
+        RecitationPresentationOverlay(
+            activeName = currentActiveName,
+            isPlaying = uiState.isRecitationPlaying,
+            isPaused = uiState.isRecitationPaused,
+            onTogglePlayPause = onToggleRecitation,
+            onDismiss = onToggleRecitation,
+            onNameClick = onNameClick
+        )
     }
 }

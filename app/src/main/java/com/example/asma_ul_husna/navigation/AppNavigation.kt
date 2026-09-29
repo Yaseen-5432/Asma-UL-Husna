@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -49,12 +50,13 @@ import com.example.asma_ul_husna.ui.home.HomeViewModel
 import com.example.asma_ul_husna.ui.home.HomeViewModelFactory
 import com.example.asma_ul_husna.ui.settings.SettingsScreen
 import com.example.asma_ul_husna.ui.settings.SettingsViewModel
-import androidx.compose.ui.text.font.FontWeight
 import com.example.asma_ul_husna.ui.settings.SettingsViewModelFactory
-import com.example.asma_ul_husna.ui.theme.DeepNavy
-import com.example.asma_ul_husna.ui.theme.IslamicGold
-import com.example.asma_ul_husna.ui.theme.TextSecondary
-
+import com.example.asma_ul_husna.ui.theme.BrightGold
+import com.example.asma_ul_husna.ui.theme.DeepIndigo
+import com.example.asma_ul_husna.ui.theme.DeepIndigoDark
+import com.example.asma_ul_husna.ui.theme.PrimaryPurple
+import com.example.asma_ul_husna.ui.theme.TextOnDark
+import com.example.asma_ul_husna.ui.theme.TextOnDarkSecondary
 
 sealed class Screen(
     val route: String,
@@ -119,11 +121,11 @@ fun AppNavigation(
     val shouldShowBottomBar = bottomNavScreens.any { it.route == currentRoute }
 
     Scaffold(
-        containerColor = DeepNavy,
+        containerColor = DeepIndigo,
         bottomBar = {
             if (shouldShowBottomBar) {
                 NavigationBar(
-                    containerColor = DeepNavy,
+                    containerColor = DeepIndigoDark,
                     tonalElevation = 0.dp
                 ) {
                     bottomNavScreens.forEach { screen ->
@@ -150,16 +152,16 @@ fun AppNavigation(
                                 Text(
                                     text = stringResource(screen.titleRes),
                                     style = MaterialTheme.typography.labelMedium.copy(
-                                        fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                                     )
                                 )
                             },
                             colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = DeepNavy,
-                                selectedTextColor = IslamicGold,
-                                indicatorColor = IslamicGold,
-                                unselectedIconColor = TextSecondary,
-                                unselectedTextColor = TextSecondary
+                                selectedIconColor = BrightGold,
+                                selectedTextColor = BrightGold,
+                                indicatorColor = PrimaryPurple,
+                                unselectedIconColor = TextOnDarkSecondary.copy(alpha = 0.7f),
+                                unselectedTextColor = TextOnDarkSecondary.copy(alpha = 0.7f)
                             )
                         )
                     }

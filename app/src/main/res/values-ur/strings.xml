@@ -5,13 +5,37 @@
     <string name="header_title">اسماء الحسنیٰ</string>
     <string name="header_subtitle">اللہ تعالیٰ کے 99 بابرکت اور خوبصورت نام</string>
 
+    <!-- Hero Section -->
+    <string name="hero_badge">✦ اسماء الحسنیٰ</string>
+    <string name="hero_title">99 بابرکت نام</string>
+    <string name="hero_subtitle">تلاش کریں • غور کریں • سنیں</string>
+    <string name="hero_arabic">أَسْمَاءُ اللهِ الْحُسْنَى</string>
+
+    <!-- Quick Actions -->
+    <string name="quick_actions_title">فوری رسائی</string>
+    <string name="quick_action_recitation">مکمل تلاوت</string>
+    <string name="quick_action_recitation_desc">خوبصورت تلاوت سنیں</string>
+    <string name="quick_action_favorites">پسندیدہ</string>
+    <string name="quick_action_favorites_desc">محفوظ شدہ نام</string>
+
+    <!-- Featured Name -->
+    <string name="featured_name_badge">✦ آج کا بابرکت نام</string>
+    <string name="action_view_details">تفصیل دیکھیں</string>
+
+    <!-- Filter Chips -->
+    <string name="filter_all">تمام (99)</string>
+    <string name="filter_part1">1 – 33</string>
+    <string name="filter_part2">34 – 66</string>
+    <string name="filter_part3">67 – 99</string>
+    <string name="filter_favorites">پسندیدہ</string>
+
     <!-- Navigation -->
     <string name="nav_home">ہوم</string>
     <string name="nav_favorites">پسندیدہ</string>
     <string name="nav_settings">ترتیبات</string>
 
     <!-- Search -->
-    <string name="search_placeholder">نام تلاش کریں...</string>
+    <string name="search_placeholder">99 نام تلاش کریں…</string>
     <string name="search_clear">تلاش صاف کریں</string>
     <string name="search_no_results">کوئی نام نہیں ملا</string>
     <string name="search_no_results_desc">کسی دوسرے اردو، عربی یا انگریزی لفظ سے تلاش کرنے کی کوشش کریں</string>

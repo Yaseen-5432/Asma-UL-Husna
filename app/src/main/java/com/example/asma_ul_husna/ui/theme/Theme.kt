@@ -4,7 +4,6 @@ import android.app.Activity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.toArgb
@@ -13,20 +12,20 @@ import androidx.core.view.WindowCompat
 import com.example.asma_ul_husna.data.model.AppTheme
 
 private val DarkColorScheme = darkColorScheme(
-    primary = IslamicGold,
-    onPrimary = DeepNavy,
-    primaryContainer = GoldContainer,
+    primary = PrimaryPurple,
+    onPrimary = TextWhite,
+    primaryContainer = DeepIndigoSurface,
     onPrimaryContainer = PaleGold,
     secondary = BrightGold,
-    onSecondary = DeepNavy,
-    secondaryContainer = GlassSurfaceElevated,
+    onSecondary = DeepIndigo,
+    secondaryContainer = DeepIndigoSurface,
     onSecondaryContainer = TextWhite,
-    background = DeepNavy,
+    background = DeepIndigo,
     onBackground = TextWhite,
-    surface = GlassSurface,
-    onSurface = TextWhite,
-    surfaceVariant = GlassSurfaceElevated,
-    onSurfaceVariant = TextMuted,
+    surface = CardWhite,
+    onSurface = TextPrimary,
+    surfaceVariant = CardOffWhite,
+    onSurfaceVariant = TextSecondary,
     outline = BorderNavy,
     outlineVariant = GoldBorder,
     error = FavoriteRed,
@@ -34,20 +33,20 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = darkColorScheme(
-    primary = IslamicGold,
-    onPrimary = DeepNavy,
-    primaryContainer = GoldContainer,
+    primary = PrimaryPurple,
+    onPrimary = TextWhite,
+    primaryContainer = DeepIndigoSurface,
     onPrimaryContainer = PaleGold,
     secondary = BrightGold,
-    onSecondary = DeepNavy,
-    secondaryContainer = GlassSurfaceElevated,
+    onSecondary = DeepIndigo,
+    secondaryContainer = DeepIndigoSurface,
     onSecondaryContainer = TextWhite,
-    background = DeepNavy,
+    background = DeepIndigo,
     onBackground = TextWhite,
-    surface = GlassSurface,
-    onSurface = TextWhite,
-    surfaceVariant = GlassSurfaceElevated,
-    onSurfaceVariant = TextMuted,
+    surface = CardWhite,
+    onSurface = TextPrimary,
+    surfaceVariant = CardOffWhite,
+    onSurfaceVariant = TextSecondary,
     outline = BorderNavy,
     outlineVariant = GoldBorder,
     error = FavoriteRed,
@@ -65,15 +64,15 @@ fun AsmaulHusnaTheme(
         AppTheme.LIGHT -> false
     }
 
-    // App identity requires deep navy (#0d1b2a), gold (#d4af37), and glassmorphism across all screens
+    // App identity uses deep indigo (#1E174F), primary purple, gold accents, and clean white cards
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = DeepNavy.toArgb()
-            window.navigationBarColor = DeepNavy.toArgb()
+            window.statusBarColor = DeepIndigoDark.toArgb()
+            window.navigationBarColor = DeepIndigoDark.toArgb()
             val insetsController = WindowCompat.getInsetsController(window, view)
             insetsController.isAppearanceLightStatusBars = false
             insetsController.isAppearanceLightNavigationBars = false

@@ -1,5 +1,8 @@
 package com.example.asma_ul_husna.ui.detail
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,12 +18,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.FavoriteBorder
@@ -45,6 +50,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -63,14 +71,20 @@ import com.example.asma_ul_husna.ui.components.ErrorStateView
 import com.example.asma_ul_husna.ui.theme.ArabicFontFamily
 import com.example.asma_ul_husna.ui.theme.AsmaulHusnaTheme
 import com.example.asma_ul_husna.ui.theme.BrightGold
-import com.example.asma_ul_husna.ui.theme.DeepNavy
+import com.example.asma_ul_husna.ui.theme.CardWhite
+import com.example.asma_ul_husna.ui.theme.DeepIndigo
+import com.example.asma_ul_husna.ui.theme.DeepIndigoDark
 import com.example.asma_ul_husna.ui.theme.EnglishFontFamily
 import com.example.asma_ul_husna.ui.theme.FavoriteRed
-import com.example.asma_ul_husna.ui.theme.GlassBorder
-import com.example.asma_ul_husna.ui.theme.GlassSurface
 import com.example.asma_ul_husna.ui.theme.IslamicGold
+import com.example.asma_ul_husna.ui.theme.PaleGold
+import com.example.asma_ul_husna.ui.theme.PrimaryPurple
+import com.example.asma_ul_husna.ui.theme.PrimaryPurpleLight
+import com.example.asma_ul_husna.ui.theme.TextOnDark
+import com.example.asma_ul_husna.ui.theme.TextOnDarkSecondary
 import com.example.asma_ul_husna.ui.theme.TextPrimary
 import com.example.asma_ul_husna.ui.theme.TextSecondary
+import com.example.asma_ul_husna.ui.theme.getCardAccentTheme
 
 @Composable
 fun NameDetailScreen(
@@ -108,15 +122,24 @@ fun NameDetailContent(
 ) {
     val scrollState = rememberScrollState()
 
+    val heartScale by animateFloatAsState(
+        targetValue = if (uiState.isFavorite) 1.2f else 1.0f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = "detailHeartScale"
+    )
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
                         text = uiState.name?.transliteration ?: stringResource(R.string.app_name),
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.SemiBold,
-                            color = TextPrimary
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = TextOnDark
                         )
                     )
                 },
@@ -125,7 +148,7 @@ fun NameDetailContent(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.action_back),
-                            tint = IslamicGold
+                            tint = BrightGold
                         )
                     }
                 },
@@ -137,29 +160,30 @@ fun NameDetailContent(
                                 contentDescription = stringResource(
                                     if (uiState.isFavorite) R.string.action_remove_favorite else R.string.action_add_favorite
                                 ),
-                                tint = if (uiState.isFavorite) FavoriteRed else TextSecondary
+                                tint = if (uiState.isFavorite) FavoriteRed else TextOnDarkSecondary,
+                                modifier = Modifier.scale(heartScale)
                             )
                         }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = DeepNavy,
-                    titleContentColor = TextPrimary
+                    containerColor = DeepIndigo,
+                    titleContentColor = TextOnDark
                 )
             )
         },
-        containerColor = DeepNavy,
+        containerColor = DeepIndigo,
         modifier = modifier.fillMaxSize()
     ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(DeepNavy)
+                .background(DeepIndigo)
         ) {
             if (uiState.isLoading) {
                 CircularProgressIndicator(
-                    color = IslamicGold,
+                    color = BrightGold,
                     modifier = Modifier.align(Alignment.Center)
                 )
             } else if (uiState.error != null || uiState.name == null) {
@@ -170,6 +194,7 @@ fun NameDetailContent(
                 )
             } else {
                 val name = uiState.name
+                val accent = getCardAccentTheme(name.id)
 
                 Column(
                     modifier = Modifier
@@ -178,7 +203,7 @@ fun NameDetailContent(
                         .padding(horizontal = 20.dp, vertical = 12.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Quick navigation: Previous and Next
+                    // Quick Navigation Bar: Previous (#01) ... #02 / 99 ... Next (#03)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -186,51 +211,57 @@ fun NameDetailContent(
                     ) {
                         OutlinedButton(
                             onClick = onPrevClick,
-                            shape = RoundedCornerShape(12.dp),
-                            border = BorderStroke(0.8.dp, IslamicGold.copy(alpha = 0.4f)),
+                            shape = RoundedCornerShape(16.dp),
+                            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.2f)),
                             colors = ButtonDefaults.outlinedButtonColors(
-                                containerColor = GlassSurface,
-                                contentColor = IslamicGold
+                                containerColor = Color.White.copy(alpha = 0.08f),
+                                contentColor = BrightGold
                             ),
-                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = null,
                                 modifier = Modifier.size(16.dp)
                             )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(text = "#${if (name.id <= 1) 99 else name.id - 1}", style = MaterialTheme.typography.labelMedium)
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "#${if (name.id <= 1) 99 else name.id - 1}",
+                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+                            )
                         }
 
-                        // Number Pill
+                        // Number Badge Pill
                         Surface(
-                            shape = RoundedCornerShape(12.dp),
-                            color = IslamicGold.copy(alpha = 0.12f),
-                            border = BorderStroke(1.dp, IslamicGold.copy(alpha = 0.4f))
+                            shape = RoundedCornerShape(16.dp),
+                            color = PrimaryPurple.copy(alpha = 0.35f),
+                            border = BorderStroke(1.dp, BrightGold.copy(alpha = 0.4f))
                         ) {
                             Text(
                                 text = "${name.id} / 99",
                                 style = MaterialTheme.typography.labelLarge.copy(
                                     fontWeight = FontWeight.Bold,
-                                    color = IslamicGold
+                                    color = BrightGold
                                 ),
-                                modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                             )
                         }
 
                         OutlinedButton(
                             onClick = onNextClick,
-                            shape = RoundedCornerShape(12.dp),
-                            border = BorderStroke(0.8.dp, IslamicGold.copy(alpha = 0.4f)),
+                            shape = RoundedCornerShape(16.dp),
+                            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.2f)),
                             colors = ButtonDefaults.outlinedButtonColors(
-                                containerColor = GlassSurface,
-                                contentColor = IslamicGold
+                                containerColor = Color.White.copy(alpha = 0.08f),
+                                contentColor = BrightGold
                             ),
-                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp)
                         ) {
-                            Text(text = "#${if (name.id >= 99) 1 else name.id + 1}", style = MaterialTheme.typography.labelMedium)
-                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "#${if (name.id >= 99) 1 else name.id + 1}",
+                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                                 contentDescription = null,
@@ -239,299 +270,321 @@ fun NameDetailContent(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(18.dp))
 
-                    // Hero Card (Glass translucent card)
+                    // 1. Hero Presentation Card (Large Arabic Calligraphy + Transliteration + Audio Player)
                     Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(20.dp),
-                        colors = CardDefaults.cardColors(containerColor = GlassSurface),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .shadow(
+                                elevation = 12.dp,
+                                shape = RoundedCornerShape(26.dp),
+                                ambientColor = PrimaryPurple.copy(alpha = 0.4f),
+                                spotColor = Color(0x66000000)
+                            ),
+                        shape = RoundedCornerShape(26.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                         border = BorderStroke(
-                            1.dp,
-                            Brush.verticalGradient(
-                                listOf(IslamicGold.copy(alpha = 0.45f), IslamicGold.copy(alpha = 0.12f))
+                            width = 1.dp,
+                            brush = Brush.linearGradient(
+                                colors = listOf(
+                                    PrimaryPurpleLight.copy(alpha = 0.6f),
+                                    IslamicGold.copy(alpha = 0.35f),
+                                    Color.Transparent
+                                )
                             )
-                        ),
+                        )
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    Brush.verticalGradient(
+                                        colors = listOf(
+                                            PrimaryPurple,
+                                            PrimaryPurple.copy(alpha = 0.85f),
+                                            DeepIndigoDark
+                                        )
+                                    )
+                                )
+                                .padding(24.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                // Large Arabic Name
+                                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                                    Text(
+                                        text = name.arabic,
+                                        style = MaterialTheme.typography.displayMedium.copy(
+                                            fontFamily = ArabicFontFamily,
+                                            fontSize = 42.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = BrightGold,
+                                            textAlign = TextAlign.Center,
+                                            textDirection = TextDirection.Rtl,
+                                            lineHeight = 56.sp
+                                        ),
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.height(10.dp))
+
+                                // Transliteration
+                                Text(
+                                    text = name.transliteration,
+                                    style = MaterialTheme.typography.headlineMedium.copy(
+                                        fontFamily = EnglishFontFamily,
+                                        fontWeight = FontWeight.Bold,
+                                        color = TextOnDark,
+                                        textAlign = TextAlign.Center
+                                    )
+                                )
+
+                                Spacer(modifier = Modifier.height(4.dp))
+
+                                // Quick English Meaning
+                                Text(
+                                    text = name.englishMeaning,
+                                    style = MaterialTheme.typography.titleMedium.copy(
+                                        fontFamily = EnglishFontFamily,
+                                        color = TextOnDarkSecondary,
+                                        textAlign = TextAlign.Center
+                                    )
+                                )
+
+                                Spacer(modifier = Modifier.height(20.dp))
+
+                                // Audio Playback & Action Controls Row
+                                val isCurrentAudioLoading = uiState.isAudioUrlLoading || (uiState.playbackState is AudioPlaybackState.Loading && uiState.playbackState.id == name.id)
+                                val isCurrentAudioPlaying = uiState.playbackState is AudioPlaybackState.Playing && uiState.playbackState.id == name.id
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Button(
+                                        onClick = {
+                                            if (isCurrentAudioPlaying) {
+                                                onPauseAudio()
+                                            } else {
+                                                onPlayAudio()
+                                            }
+                                        },
+                                        enabled = !isCurrentAudioLoading,
+                                        shape = RoundedCornerShape(16.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = IslamicGold,
+                                            contentColor = DeepIndigoDark
+                                        ),
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        if (isCurrentAudioLoading) {
+                                            CircularProgressIndicator(
+                                                color = DeepIndigoDark,
+                                                strokeWidth = 2.dp,
+                                                modifier = Modifier.size(16.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(
+                                                text = stringResource(R.string.action_loading_audio),
+                                                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
+                                            )
+                                        } else {
+                                            Icon(
+                                                imageVector = if (isCurrentAudioPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(
+                                                text = if (isCurrentAudioPlaying)
+                                                    stringResource(R.string.action_pause_audio)
+                                                else
+                                                    stringResource(R.string.action_play_audio),
+                                                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
+                                            )
+                                        }
+                                    }
+                                }
+
+                                // Audio Error Message if any
+                                val audioErrorMessage = uiState.audioError ?: (uiState.playbackState as? AudioPlaybackState.Error)?.takeIf { it.id == name.id }?.message
+                                if (audioErrorMessage != null) {
+                                    Spacer(modifier = Modifier.height(10.dp))
+                                    Surface(
+                                        shape = RoundedCornerShape(10.dp),
+                                        color = FavoriteRed.copy(alpha = 0.2f),
+                                        border = BorderStroke(0.5.dp, FavoriteRed.copy(alpha = 0.5f)),
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Text(
+                                            text = audioErrorMessage,
+                                            style = MaterialTheme.typography.bodySmall.copy(
+                                                color = TextOnDark,
+                                                textAlign = TextAlign.Center
+                                            ),
+                                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(18.dp))
+
+                    // 2. English Meaning & Explanation Card (Modern White Card)
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .shadow(
+                                elevation = 6.dp,
+                                shape = RoundedCornerShape(22.dp),
+                                ambientColor = Color(0x14000000),
+                                spotColor = Color(0x1F000000)
+                            ),
+                        shape = RoundedCornerShape(22.dp),
+                        colors = CardDefaults.cardColors(containerColor = CardWhite),
                         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                     ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(
-                                    Brush.verticalGradient(
-                                        listOf(Color(0x0AFFFFFF), Color(0x00FFFFFF))
-                                    )
-                                )
-                                .padding(24.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                                .padding(20.dp)
                         ) {
-                            // Large Arabic Name (RTL, Serif font, Gold)
-                            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = accent.background
+                            ) {
                                 Text(
-                                    text = name.arabic,
-                                    style = MaterialTheme.typography.displayMedium.copy(
-                                        fontFamily = ArabicFontFamily,
-                                        fontSize = 38.sp,
+                                    text = stringResource(R.string.meaning_english_title),
+                                    style = MaterialTheme.typography.labelMedium.copy(
                                         fontWeight = FontWeight.Bold,
-                                        color = BrightGold,
-                                        textAlign = TextAlign.Center,
-                                        textDirection = TextDirection.Rtl,
-                                        lineHeight = 52.sp
+                                        color = accent.primary,
+                                        letterSpacing = 0.5.sp
                                     ),
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                                 )
                             }
 
                             Spacer(modifier = Modifier.height(8.dp))
 
-                            // Transliteration
-                            Text(
-                                text = name.transliteration,
-                                style = MaterialTheme.typography.headlineMedium.copy(
-                                    fontFamily = EnglishFontFamily,
-                                    fontWeight = FontWeight.Bold,
-                                    color = TextPrimary,
-                                    textAlign = TextAlign.Center
-                                )
-                            )
-
-                            Spacer(modifier = Modifier.height(4.dp))
-
-                            // Quick meaning summary
                             Text(
                                 text = name.englishMeaning,
-                                style = MaterialTheme.typography.titleMedium.copy(
-                                    fontFamily = EnglishFontFamily,
-                                    color = TextSecondary,
-                                    textAlign = TextAlign.Center
-                                )
-                            )
-
-                            Spacer(modifier = Modifier.height(18.dp))
-
-                            // Action buttons row: Audio & Favorite
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                val isCurrentAudioLoading = uiState.isAudioUrlLoading || (uiState.playbackState is AudioPlaybackState.Loading && uiState.playbackState.id == name.id)
-                                val isCurrentAudioPlaying = uiState.playbackState is AudioPlaybackState.Playing && uiState.playbackState.id == name.id
-
-                                // Audio Button
-                                Button(
-                                    onClick = {
-                                        if (isCurrentAudioPlaying) {
-                                             onPauseAudio()
-                                        } else {
-                                            onPlayAudio()
-                                        }
-                                    },
-                                    enabled = !isCurrentAudioLoading,
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = IslamicGold,
-                                        contentColor = DeepNavy,
-                                        disabledContainerColor = IslamicGold.copy(alpha = 0.6f),
-                                        disabledContentColor = DeepNavy.copy(alpha = 0.7f)
-                                    ),
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    if (isCurrentAudioLoading) {
-                                        CircularProgressIndicator(
-                                            color = DeepNavy,
-                                            strokeWidth = 2.dp,
-                                            modifier = Modifier.size(16.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(6.dp))
-                                        Text(
-                                            text = stringResource(R.string.action_loading_audio),
-                                            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
-                                            maxLines = 1
-                                        )
-                                    } else {
-                                        Icon(
-                                            imageVector = if (isCurrentAudioPlaying)
-                                                 Icons.Filled.Pause
-                                            else
-                                                 Icons.Filled.PlayArrow,
-                                            contentDescription = null,
-                                            modifier = Modifier.size(18.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(6.dp))
-                                        Text(
-                                            text = if (isCurrentAudioPlaying)
-                                                stringResource(R.string.action_pause_audio)
-                                            else
-                                                stringResource(R.string.action_play_audio),
-                                            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
-                                            maxLines = 1
-                                        )
-                                    }
-                                }
-
-                                // Favorite Toggle Button
-                                OutlinedButton(
-                                    onClick = onFavoriteToggle,
-                                    shape = RoundedCornerShape(12.dp),
-                                    border = BorderStroke(
-                                        1.dp,
-                                        if (uiState.isFavorite) FavoriteRed else IslamicGold.copy(alpha = 0.4f)
-                                    ),
-                                    colors = ButtonDefaults.outlinedButtonColors(
-                                        containerColor = GlassSurface,
-                                        contentColor = if (uiState.isFavorite) FavoriteRed else TextPrimary
-                                    ),
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Icon(
-                                        imageVector = if (uiState.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                                        contentDescription = null,
-                                        tint = if (uiState.isFavorite) FavoriteRed else TextPrimary,
-                                        modifier = Modifier.size(18.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text(
-                                        text = stringResource(
-                                            if (uiState.isFavorite) R.string.action_remove_favorite else R.string.action_add_favorite
-                                        ),
-                                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
-                                        maxLines = 1
-                                    )
-                                }
-                            }
-
-                            // Optional inline audio error notice
-                            val audioErrorMessage = uiState.audioError ?: (uiState.playbackState as? AudioPlaybackState.Error)?.takeIf { it.id == name.id }?.message
-                            if (audioErrorMessage != null) {
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Surface(
-                                    shape = RoundedCornerShape(8.dp),
-                                    color = FavoriteRed.copy(alpha = 0.12f),
-                                    border = BorderStroke(0.5.dp, FavoriteRed.copy(alpha = 0.35f)),
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Text(
-                                        text = audioErrorMessage,
-                                        style = MaterialTheme.typography.bodySmall.copy(
-                                            color = TextPrimary,
-                                            textAlign = TextAlign.Center
-                                        ),
-                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // English Section Card
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = CardDefaults.cardColors(containerColor = GlassSurface),
-                        border = BorderStroke(1.dp, GlassBorder),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(18.dp)
-                        ) {
-                            Text(
-                                text = stringResource(R.string.meaning_english_title),
-                                style = MaterialTheme.typography.titleSmall.copy(
+                                style = MaterialTheme.typography.titleLarge.copy(
                                     fontWeight = FontWeight.Bold,
-                                    color = IslamicGold,
-                                    letterSpacing = 0.5.sp
-                                )
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = name.englishMeaning,
-                                style = MaterialTheme.typography.titleMedium.copy(
-                                    fontWeight = FontWeight.SemiBold,
                                     color = TextPrimary
                                 )
                             )
 
-                            Spacer(modifier = Modifier.height(14.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
 
-                            Text(
-                                text = stringResource(R.string.explanation_english_title),
-                                style = MaterialTheme.typography.titleSmall.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    color = IslamicGold,
-                                    letterSpacing = 0.5.sp
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = accent.background
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.explanation_english_title),
+                                    style = MaterialTheme.typography.labelMedium.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        color = accent.primary,
+                                        letterSpacing = 0.5.sp
+                                    ),
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                                 )
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
+                            }
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
                             Text(
                                 text = name.explanation,
                                 style = MaterialTheme.typography.bodyLarge.copy(
                                     color = TextSecondary,
-                                    lineHeight = 22.sp
+                                    lineHeight = 24.sp
                                 )
                             )
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(18.dp))
 
-                    // Urdu Section Card (RTL Aware)
+                    // 3. Urdu Meaning & Explanation Card (Modern White Card, RTL)
                     Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = CardDefaults.cardColors(containerColor = GlassSurface),
-                        border = BorderStroke(1.dp, GlassBorder),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .shadow(
+                                elevation = 6.dp,
+                                shape = RoundedCornerShape(22.dp),
+                                ambientColor = Color(0x14000000),
+                                spotColor = Color(0x1F000000)
+                            ),
+                        shape = RoundedCornerShape(22.dp),
+                        colors = CardDefaults.cardColors(containerColor = CardWhite),
                         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                     ) {
                         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(18.dp)
+                                    .padding(20.dp)
                             ) {
-                                Text(
-                                    text = stringResource(R.string.meaning_urdu_title),
-                                    style = MaterialTheme.typography.titleMedium.copy(
-                                        fontWeight = FontWeight.Bold,
-                                        color = IslamicGold,
-                                        textDirection = TextDirection.Rtl
-                                    ),
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                                Spacer(modifier = Modifier.height(4.dp))
+                                Surface(
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = accent.background
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.meaning_urdu_title),
+                                        style = MaterialTheme.typography.labelLarge.copy(
+                                            fontWeight = FontWeight.Bold,
+                                            color = accent.primary,
+                                            textDirection = TextDirection.Rtl
+                                        ),
+                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
                                 Text(
                                     text = name.nameUrdu,
                                     style = MaterialTheme.typography.headlineSmall.copy(
-                                        fontWeight = FontWeight.SemiBold,
-                                        fontSize = 19.sp,
-                                        color = TextPrimary,
-                                        textDirection = TextDirection.Rtl
-                                    ),
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-
-                                Spacer(modifier = Modifier.height(14.dp))
-
-                                Text(
-                                    text = stringResource(R.string.explanation_urdu_title),
-                                    style = MaterialTheme.typography.titleMedium.copy(
                                         fontWeight = FontWeight.Bold,
-                                        color = IslamicGold,
-                                        textDirection = TextDirection.Rtl
+                                        color = TextPrimary,
+                                        textDirection = TextDirection.Rtl,
+                                        fontSize = 22.sp
                                     ),
                                     modifier = Modifier.fillMaxWidth()
                                 )
-                                Spacer(modifier = Modifier.height(4.dp))
+
+                                Spacer(modifier = Modifier.height(16.dp))
+
+                                Surface(
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = accent.background
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.explanation_urdu_title),
+                                        style = MaterialTheme.typography.labelLarge.copy(
+                                            fontWeight = FontWeight.Bold,
+                                            color = accent.primary,
+                                            textDirection = TextDirection.Rtl
+                                        ),
+                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
                                 Text(
                                     text = name.meaningUrdu,
                                     style = MaterialTheme.typography.bodyLarge.copy(
-                                        fontSize = 16.5.sp,
                                         color = TextSecondary,
-                                        lineHeight = 27.sp,
+                                        lineHeight = 28.sp,
+                                        fontSize = 17.sp,
                                         textDirection = TextDirection.Rtl
                                     ),
                                     modifier = Modifier.fillMaxWidth()
@@ -540,16 +593,16 @@ fun NameDetailContent(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(32.dp))
+                    Spacer(modifier = Modifier.height(36.dp))
                 }
             }
         }
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF0D1B2A)
+@Preview(showBackground = true, backgroundColor = 0xFF1E174F)
 @Composable
-fun NameDetailPreview() {
+fun NameDetailModernPreview() {
     AsmaulHusnaTheme {
         NameDetailContent(
             uiState = NameDetailUiState(
@@ -576,4 +629,3 @@ fun NameDetailPreview() {
         )
     }
 }
-
