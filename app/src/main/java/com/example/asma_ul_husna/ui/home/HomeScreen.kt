@@ -24,18 +24,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.asma_ul_husna.R
+import com.example.asma_ul_husna.data.model.AsmaName
 import com.example.asma_ul_husna.ui.components.AppSearchBar
 import com.example.asma_ul_husna.ui.components.CategoryChipsRow
 import com.example.asma_ul_husna.ui.components.EmptyStateView
 import com.example.asma_ul_husna.ui.components.ErrorStateView
 import com.example.asma_ul_husna.ui.components.FeaturedNameCard
 import com.example.asma_ul_husna.ui.components.FullRecitationButton
+import com.example.asma_ul_husna.ui.components.GiftBoxRevealOverlay
 import com.example.asma_ul_husna.ui.components.HeaderSection
 import com.example.asma_ul_husna.ui.components.HeroCard
 import com.example.asma_ul_husna.ui.components.NameCard
@@ -82,6 +86,19 @@ fun HomeScreenContent(
     val gridState = rememberLazyGridState()
     val activeId = uiState.recitationCurrentNameId
     val isRecitationActive = activeId != null
+
+    var pendingGiftName by remember { mutableStateOf<AsmaName?>(null) }
+
+    val handleNameCardClick: (Int) -> Unit = { nameId ->
+        if (pendingGiftName == null) {
+            val targetName = uiState.names.firstOrNull { it.id == nameId }
+            if (targetName != null) {
+                pendingGiftName = targetName
+            } else {
+                onNameClick(nameId)
+            }
+        }
+    }
 
     // Find the currently recited Name object from the full dataset
     val currentActiveName = remember(activeId, uiState.names) {
@@ -176,7 +193,7 @@ fun HomeScreenContent(
                         FeaturedNameCard(
                             name = featured,
                             isFavorite = uiState.favoriteIds.contains(featured.id),
-                            onNameClick = onNameClick,
+                            onNameClick = handleNameCardClick,
                             onFavoriteToggle = onFavoriteToggle,
                             modifier = Modifier.padding(bottom = 4.dp)
                         )
@@ -239,7 +256,7 @@ fun HomeScreenContent(
                             isPlaying = uiState.isRecitationPlaying,
                             isPaused = uiState.isRecitationPaused,
                             relativePosition = relativePosition,
-                            onCardClick = { onNameClick(name.id) },
+                            onCardClick = { handleNameCardClick(name.id) },
                             onFavoriteToggle = { onFavoriteToggle(name.id) }
                         )
                     }
@@ -256,8 +273,21 @@ fun HomeScreenContent(
             isPaused = uiState.isRecitationPaused,
             onTogglePlayPause = onToggleRecitation,
             onDismiss = onStopRecitation,
-  //          onDismiss = onToggleRecitation,
             onNameClick = onNameClick
+        )
+
+        // =========================================================================
+        // Gift-box Opening + Colorful Sprinkle Pop Navigation Overlay
+        // =========================================================================
+        GiftBoxRevealOverlay(
+            name = pendingGiftName,
+            onAnimationComplete = {
+                val targetId = pendingGiftName?.id
+                pendingGiftName = null
+                if (targetId != null) {
+                    onNameClick(targetId)
+                }
+            }
         )
     }
 }
