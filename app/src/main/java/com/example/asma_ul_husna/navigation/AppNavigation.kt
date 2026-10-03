@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Quiz
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Quiz
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -38,7 +40,11 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.asma_ul_husna.R
 import com.example.asma_ul_husna.audio.AppAudioPlayer
+import com.example.asma_ul_husna.data.local.QuizJsonDataSource
+import com.example.asma_ul_husna.data.local.UserPreferencesRepository
+import com.example.asma_ul_husna.data.repository.QuizRepositoryImpl
 import com.example.asma_ul_husna.domain.repository.NamesRepository
+import com.example.asma_ul_husna.domain.repository.QuizRepository
 import com.example.asma_ul_husna.ui.detail.NameDetailScreen
 import com.example.asma_ul_husna.ui.detail.NameDetailViewModel
 import com.example.asma_ul_husna.ui.detail.NameDetailViewModelFactory
@@ -48,6 +54,9 @@ import com.example.asma_ul_husna.ui.favorites.FavoritesViewModelFactory
 import com.example.asma_ul_husna.ui.home.HomeScreen
 import com.example.asma_ul_husna.ui.home.HomeViewModel
 import com.example.asma_ul_husna.ui.home.HomeViewModelFactory
+import com.example.asma_ul_husna.ui.quiz.QuizScreen
+import com.example.asma_ul_husna.ui.quiz.QuizViewModel
+import com.example.asma_ul_husna.ui.quiz.QuizViewModelFactory
 import com.example.asma_ul_husna.ui.settings.SettingsScreen
 import com.example.asma_ul_husna.ui.settings.SettingsViewModel
 import com.example.asma_ul_husna.ui.settings.SettingsViewModelFactory
@@ -70,6 +79,13 @@ sealed class Screen(
         titleRes = R.string.nav_home,
         selectedIcon = Icons.Filled.Home,
         unselectedIcon = Icons.Outlined.Home
+    )
+
+    object Quiz : Screen(
+        route = "quiz",
+        titleRes = R.string.nav_quiz,
+        selectedIcon = Icons.Filled.Quiz,
+        unselectedIcon = Icons.Outlined.Quiz
     )
 
     object Favorites : Screen(
@@ -98,6 +114,7 @@ sealed class Screen(
 
 val bottomNavScreens = listOf(
     Screen.Home,
+    Screen.Quiz,
     Screen.Favorites,
     Screen.Settings
 )
@@ -105,9 +122,16 @@ val bottomNavScreens = listOf(
 @Composable
 fun AppNavigation(
     repository: NamesRepository,
+    quizRepository: QuizRepository? = null,
     navController: NavHostController = rememberNavController()
 ) {
     val context = LocalContext.current
+    val effectiveQuizRepository = remember(quizRepository) {
+        quizRepository ?: QuizRepositoryImpl(
+            localDataSource = QuizJsonDataSource(context.applicationContext),
+            userPreferencesRepository = UserPreferencesRepository(context.applicationContext)
+        )
+    }
     val audioPlayer = remember { AppAudioPlayer(context) }
 
     DisposableEffect(Unit) {
@@ -187,6 +211,28 @@ fun AppNavigation(
                     viewModel = homeViewModel,
                     onNameClick = { nameId ->
                         navController.navigate(Screen.Detail.createRoute(nameId))
+                    }
+                )
+            }
+
+            // Quiz Screen
+            composable(Screen.Quiz.route) {
+                val quizViewModel: QuizViewModel = viewModel(
+                    factory = QuizViewModelFactory(
+                        quizRepository = effectiveQuizRepository,
+                        namesRepository = repository
+                    )
+                )
+                QuizScreen(
+                    viewModel = quizViewModel,
+                    onNavigateToHome = {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     }
                 )
             }
