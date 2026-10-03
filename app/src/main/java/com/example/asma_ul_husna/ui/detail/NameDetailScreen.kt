@@ -1,9 +1,14 @@
 package com.example.asma_ul_husna.ui.detail
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -32,10 +37,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -54,6 +61,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -66,6 +75,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -75,6 +85,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.asma_ul_husna.R
 import com.example.asma_ul_husna.audio.AudioPlaybackState
 import com.example.asma_ul_husna.data.model.AsmaName
@@ -141,9 +154,37 @@ fun NameDetailContent(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     val colors = MaterialTheme.appColors
     val scrollState = rememberScrollState()
     var slideDirection by remember { mutableStateOf(DetailSlideDirection.FORWARD) }
+
+    val ttsManager = remember {
+        ExplanationTtsManager(context) { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
+    }
+    val ttsState by ttsManager.state.collectAsState()
+
+    // When the displayed Name ID changes, immediately stop any active TTS and reset state
+    LaunchedEffect(uiState.name?.id) {
+        ttsManager.stop()
+    }
+
+    // Lifecycle observer: Stop TTS on ON_PAUSE / ON_STOP and release on disposal
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_PAUSE || event == Lifecycle.Event.ON_STOP) {
+                ttsManager.stop()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            ttsManager.release()
+        }
+    }
 
     val heartScale by animateFloatAsState(
         targetValue = if (uiState.isFavorite) 1.2f else 1.0f,
@@ -453,6 +494,7 @@ fun NameDetailContent(
                                         ) {
                                             Button(
                                                 onClick = {
+                                                    ttsManager.stop()
                                                     if (isCurrentAudioPlaying) {
                                                         onPauseAudio()
                                                     } else {
@@ -569,18 +611,44 @@ fun NameDetailContent(
 
                                     Spacer(modifier = Modifier.height(16.dp))
 
-                                    Surface(
-                                        shape = RoundedCornerShape(8.dp),
-                                        color = accent.background
+                                    // Explanation Header Row with Listen / TTS button
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Text(
-                                            text = stringResource(R.string.explanation_english_title),
-                                            style = MaterialTheme.typography.labelMedium.copy(
-                                                fontWeight = FontWeight.Bold,
-                                                color = accent.primary,
-                                                letterSpacing = 0.5.sp
-                                            ),
-                                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                                        Surface(
+                                            shape = RoundedCornerShape(8.dp),
+                                            color = accent.background
+                                        ) {
+                                            Text(
+                                                text = stringResource(R.string.explanation_english_title),
+                                                style = MaterialTheme.typography.labelMedium.copy(
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = accent.primary,
+                                                    letterSpacing = 0.5.sp
+                                                ),
+                                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                                            )
+                                        }
+
+                                        ExplanationTtsButton(
+                                            isSpeaking = ttsState.isSpeaking &&
+                                                ttsState.activeLanguage == ExplanationTtsLanguage.ENGLISH &&
+                                                ttsState.activeNameId == targetName.id,
+                                            onClick = {
+                                                ttsManager.speak(
+                                                    nameId = targetName.id,
+                                                    text = targetName.explanation,
+                                                    language = ExplanationTtsLanguage.ENGLISH,
+                                                    onPlaybackStarted = { onPauseAudio() }
+                                                )
+                                            },
+                                            accentColor = accent.primary,
+                                            accentBackground = accent.background,
+                                            isDark = colors.isDark,
+                                            textListen = stringResource(R.string.action_tts_listen),
+                                            textStop = stringResource(R.string.action_tts_stop)
                                         )
                                     }
 
@@ -649,18 +717,45 @@ fun NameDetailContent(
 
                                         Spacer(modifier = Modifier.height(16.dp))
 
-                                        Surface(
-                                            shape = RoundedCornerShape(8.dp),
-                                            color = accent.background
+                                        // Urdu Explanation Header Row with Listen / TTS button (RTL)
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            Text(
-                                                text = stringResource(R.string.explanation_urdu_title),
-                                                style = MaterialTheme.typography.labelLarge.copy(
-                                                    fontWeight = FontWeight.Bold,
-                                                    color = accent.primary,
-                                                    textDirection = TextDirection.Rtl
-                                                ),
-                                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                                            Surface(
+                                                shape = RoundedCornerShape(8.dp),
+                                                color = accent.background
+                                            ) {
+                                                Text(
+                                                    text = stringResource(R.string.explanation_urdu_title),
+                                                    style = MaterialTheme.typography.labelLarge.copy(
+                                                        fontWeight = FontWeight.Bold,
+                                                        color = accent.primary,
+                                                        textDirection = TextDirection.Rtl
+                                                    ),
+                                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                                                )
+                                            }
+
+                                            ExplanationTtsButton(
+                                                isSpeaking = ttsState.isSpeaking &&
+                                                    ttsState.activeLanguage == ExplanationTtsLanguage.URDU &&
+                                                    ttsState.activeNameId == targetName.id,
+                                                onClick = {
+                                                    ttsManager.speak(
+                                                        nameId = targetName.id,
+                                                        text = targetName.meaningUrdu,
+                                                        language = ExplanationTtsLanguage.URDU,
+                                                        onPlaybackStarted = { onPauseAudio() }
+                                                    )
+                                                },
+                                                accentColor = accent.primary,
+                                                accentBackground = accent.background,
+                                                isDark = colors.isDark,
+                                                textListen = stringResource(R.string.action_tts_listen_urdu),
+                                                textStop = stringResource(R.string.action_tts_stop_urdu),
+                                                isRtl = true
                                             )
                                         }
 
@@ -685,6 +780,81 @@ fun NameDetailContent(
                     Spacer(modifier = Modifier.height(36.dp))
                 }
             }
+        }
+    }
+}
+
+/**
+ * Modern compact button for triggering offline Text-To-Speech for the Explanation section.
+ */
+@Composable
+fun ExplanationTtsButton(
+    isSpeaking: Boolean,
+    onClick: () -> Unit,
+    accentColor: Color,
+    accentBackground: Color,
+    isDark: Boolean,
+    textListen: String,
+    textStop: String,
+    isRtl: Boolean = false,
+    modifier: Modifier = Modifier
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "ttsPulse")
+    val pulseScale by infiniteTransition.animateFloat(
+        initialValue = 0.92f,
+        targetValue = 1.15f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(650, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "speakerPulse"
+    )
+
+    val containerColor = if (isSpeaking) {
+        if (isDark) accentColor.copy(alpha = 0.25f) else accentColor.copy(alpha = 0.18f)
+    } else {
+        accentBackground
+    }
+
+    val contentColor = accentColor
+
+    val borderColor = if (isSpeaking) {
+        accentColor.copy(alpha = 0.65f)
+    } else {
+        accentColor.copy(alpha = 0.25f)
+    }
+
+    Surface(
+        onClick = onClick,
+        shape = RoundedCornerShape(12.dp),
+        color = containerColor,
+        border = BorderStroke(1.dp, borderColor),
+        modifier = modifier
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = if (isSpeaking) Icons.Filled.Stop else Icons.AutoMirrored.Filled.VolumeUp,
+                contentDescription = if (isSpeaking) textStop else textListen,
+                tint = contentColor,
+                modifier = Modifier
+                    .size(16.dp)
+                    .then(if (isSpeaking) Modifier.scale(pulseScale) else Modifier)
+            )
+
+            Spacer(modifier = Modifier.width(5.dp))
+
+            Text(
+                text = if (isSpeaking) textStop else textListen,
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = contentColor,
+                    letterSpacing = if (isRtl) 0.sp else 0.4.sp
+                )
+            )
         }
     }
 }
@@ -718,3 +888,4 @@ fun NameDetailModernPreview() {
         )
     }
 }
+

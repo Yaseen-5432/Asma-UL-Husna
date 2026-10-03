@@ -55,6 +55,12 @@
     <string name="action_add_favorite">Add to Favorites</string>
     <string name="action_remove_favorite">Remove from Favorites</string>
     <string name="action_back">Navigate back</string>
+    <string name="action_tts_listen">Listen</string>
+    <string name="action_tts_stop">Stop</string>
+    <string name="action_tts_listen_urdu">سنیں</string>
+    <string name="action_tts_stop_urdu">روکیں</string>
+    <string name="tts_urdu_unavailable">Urdu voice is not available on this device.</string>
+    <string name="tts_english_unavailable">English voice is not available on this device.</string>
 
     <!-- Favorites Screen -->
     <string name="favorites_title">Favorite Names</string>
